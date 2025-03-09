@@ -1,0 +1,74 @@
+name: deploy
+
+on:
+  push:
+    branches: [main, dev]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: npm install
+
+      # - name: Create Environment File
+      #   run: |
+      #     if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+      #       echo "${{ secrets.ENV_PRODUCTION }}" > .env.production
+      #     else
+      #       echo "${{ secrets.ENV_DEVELOPMENT }}" > .env.production
+      #     fi
+
+      - name: Build Project
+        run: npm run build
+
+      - name: Remove Unnecessary Files
+        run: rm -R .git .github .gitignore package-lock.json tsconfig.json src
+
+      - name: List Files (Debugging)
+        run: ls -la
+
+      - name: Make a Directory for SSH
+        run: mkdir -p "$HOME/.ssh"
+
+      - name: Copy SSH Key from Secrets
+        run: echo "${{ secrets.KEY }}" > "$HOME/.ssh/key"
+
+      - name: Set SSH Key Permissions
+        run: chmod 600 "$HOME/.ssh/key"
+
+      # - name: Set Deployment Path
+      #   id: set_env
+      #   run: |
+      #     if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+      #       echo "DEPLOY_PATH=${{ secrets.PATH }}" >> $GITHUB_ENV
+      #     elif [ "${{ github.ref }}" == "refs/heads/dev" ]; then
+      #       echo "DEPLOY_PATH=${{ secrets.DEVPATH }}" >> $GITHUB_ENV
+      #     fi
+
+      - name: Upload to Server
+        run: rsync -e "ssh -p 22 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . ${{ secrets.USER }}@${{ secrets.IP }}:${{ secrets.PATH }}
+
+      - name: Start Next.js Server with PM2
+        run: |
+          # if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+          #   PROCESS_NAME="main"
+          #   START_SCRIPT="start-main"
+          # else
+          #   PROCESS_NAME="dev"
+          #   START_SCRIPT="start-dev"
+          # fi
+
+          PROCESS_NAME="wordenstein"
+
+          ssh -i "$HOME/.ssh/key" -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.IP }} << EOF
+            cd ${{ secrets.PATH }}
+            pm2 stop $PROCESS_NAME || true
+            pm2 delete $PROCESS_NAME || true
+            pm2 start npm --name="$PROCESS_NAME" -- run start
+          EOF
