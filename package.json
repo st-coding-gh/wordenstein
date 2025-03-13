@@ -8,10 +8,15 @@
     "start": "next start -p 8080",
     "lint": "next lint"
   },
+  "prisma": {
+    "schema": "./database/schema.prisma"
+  },
   "dependencies": {
+    "@prisma/client": "^6.5.0",
     "@tailwindcss/postcss": "^4.0.12",
     "next": "15.2.1",
     "postcss": "^8.5.3",
+    "prisma": "^6.5.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwindcss": "^4.0.12"

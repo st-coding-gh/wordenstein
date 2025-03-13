@@ -24,8 +24,14 @@ jobs:
       #       echo "${{ secrets.ENV_DEVELOPMENT }}" > .env.production
       #     fi
 
+      - name: Create Environment File
+        run: echo "${{ secrets.ENV }}" > .env
+
       - name: Build Project
         run: npm run build
+
+      - name: prisma db push
+        run: npx prisma db push --accept-data-loss
 
       - name: Remove Unnecessary Files
         run: rm -R .git .github .gitignore package-lock.json tsconfig.json src

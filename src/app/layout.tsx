@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Wordenstein Method',
   description: 'A method to learn words invented by professor Wordenstein',
+  robots: 'noindex, nofollow',
 }
 
 export default function RootLayout({
