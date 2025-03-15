@@ -34,9 +34,6 @@ jobs:
       - name: Build Project
         run: npm run build
 
-      - name: prisma db push
-        run: npx prisma db push --accept-data-loss
-
       - name: Remove Unnecessary Files
         run: rm -R .git .github .gitignore package-lock.json tsconfig.json src
 
@@ -80,5 +77,6 @@ jobs:
             cd ${{ secrets.PATH }}
             pm2 stop $PROCESS_NAME || true
             pm2 delete $PROCESS_NAME || true
+            npx prisma db push --accept-data-loss
             pm2 start npm --name="$PROCESS_NAME" -- run start
           EOF
