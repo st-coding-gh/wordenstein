@@ -1,6 +1,12 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
+import { AntdRegistry } from '@ant-design/nextjs-registry'
+import { Auth } from '@/components/parts/auth'
+import '@ant-design/v5-patch-for-react-19'
 import './globals.css'
+import { AntdConfig } from '@/components/antd-config'
+import { Logo } from '@/components/particles/logo'
+import Link from 'next/link'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -28,7 +34,20 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <AntdRegistry>
+          <AntdConfig>
+            <Auth>
+              <div className="absolute w-full top-0 h-24 flex items-center justify-center border-b-4 border-app-primary">
+                <Link href={'/'}>
+                  <Logo />
+                </Link>
+              </div>
+              <div className="pt-28 px-3 lg:px-10 pb-10">
+                <div className="max-w-[1000px] mx-auto">{children}</div>
+              </div>
+            </Auth>
+          </AntdConfig>
+        </AntdRegistry>
       </body>
     </html>
   )
