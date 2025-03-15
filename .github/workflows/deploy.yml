@@ -23,6 +23,7 @@ jobs:
       #     else
       #       echo "${{ secrets.ENV_DEVELOPMENT }}" > .env.production
       #     fi
+      #
 
       - name: Create upload directory
         run: mkdir -p ./uploads/images/cards
