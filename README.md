@@ -47,3 +47,5 @@ Your task is to explain the prompted word meaning in order to help me to improve
   "imagePrompt": "A dark and eerie scene of a ruined temple with monstrous creatures emerging from the shadows, symbolizing something cursed and repugnant, evoking a sense of horror and moral corruption."
 }
 ```
+
+## test of deploy
