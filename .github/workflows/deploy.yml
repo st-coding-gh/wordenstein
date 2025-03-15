@@ -77,6 +77,6 @@ jobs:
             cd ${{ secrets.PATH }}
             pm2 stop $PROCESS_NAME || true
             pm2 delete $PROCESS_NAME || true
-            npx prisma db push --accept-data-loss
+            npx prisma db push
             pm2 start npm --name="$PROCESS_NAME" -- run start
           EOF
