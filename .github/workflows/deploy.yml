@@ -59,7 +59,7 @@ jobs:
       #     fi
 
       - name: Upload to Server
-        run: rsync -e "ssh -p 22 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . ${{ secrets.USER }}@${{ secrets.IP }}:${{ secrets.PATH }}
+        run: rsync -e "ssh -p 22 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete --exclude=database/migrations --exclude=database/prod.db . ${{ secrets.USER }}@${{ secrets.IP }}:${{ secrets.PATH }}
 
       - name: Start Next.js Server with PM2
         run: |
@@ -77,6 +77,6 @@ jobs:
             cd ${{ secrets.PATH }}
             pm2 stop $PROCESS_NAME || true
             pm2 delete $PROCESS_NAME || true
-            npx prisma db push
+            npx prisma migrate deploy
             pm2 start npm --name="$PROCESS_NAME" -- run start
           EOF
