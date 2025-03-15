@@ -24,6 +24,9 @@ jobs:
       #       echo "${{ secrets.ENV_DEVELOPMENT }}" > .env.production
       #     fi
 
+      - name: Create upload directory
+        run: mkdir -p ./uploads/images/cards
+
       - name: Create Environment File
         run: echo "${{ secrets.ENV }}" > .env
 
