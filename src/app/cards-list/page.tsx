@@ -40,6 +40,14 @@ export default function CardsList() {
       key: 'definition',
       render: text => <span className="text-xs">{text}</span>,
     },
+    {
+      title: 'answers',
+      dataIndex: 'correctAnswers',
+      key: 'correctAnswers',
+      render: text => (
+        <span className="flex items-center justify-center">{text}</span>
+      ),
+    },
   ]
 
   return (

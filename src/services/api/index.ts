@@ -3,6 +3,7 @@ import {
   TCardAllRes,
   TCreateUserReq,
   TLoginReq,
+  TStatsRes,
   TTrainingSettingReq,
 } from '@/types/api.types'
 import { TCard } from '@/types/card'
@@ -73,6 +74,10 @@ class Api {
 
   async answerIncorrect(query: { id: string }) {
     return await this.fetch('training/answer/incorrect', query)
+  }
+
+  async stats() {
+    return (await this.fetch('stats')) as TStatsRes
   }
 }
 

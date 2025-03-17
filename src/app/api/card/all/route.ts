@@ -20,8 +20,9 @@ async function handler() {
       id: true,
       word: true,
       definition: true,
+      correctAnswers: true,
     },
-    orderBy: { word: 'asc' },
+    orderBy: { correctAnswers: 'asc' },
   })
   return cards
 }

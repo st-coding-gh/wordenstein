@@ -18,6 +18,7 @@ export type TCardAllRes = {
   id: string
   word: string
   definition: string
+  correctAnswers: number
 }
 
 export type TCardByIdReq = { id: string }
@@ -29,4 +30,9 @@ export type TTrainingSettingReq = {
 
 export type TAnswerResultReq = {
   id: string
+}
+
+export type TStatsRes = {
+  totalCards: number
+  correctAnswersGroups: { correctAnswers: number; count: number }[]
 }

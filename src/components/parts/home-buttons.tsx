@@ -3,6 +3,7 @@ import { Button } from 'antd'
 import { useRouter } from 'next/navigation'
 import {
   AimOutlined,
+  BarChartOutlined,
   LogoutOutlined,
   PlusCircleOutlined,
   SearchOutlined,
@@ -15,6 +16,7 @@ export function ButtonGroup() {
         <CardsTrainButton />
         <CardAddButton />
         <CardsListButton />
+        <StatsButton />
         <Logout />
       </div>
     </div>
@@ -25,6 +27,7 @@ function Logout() {
   return (
     <Button
       type="primary"
+      size="large"
       onClick={async () => {
         const res = await api.logout()
         if (res) window.location.reload()
@@ -42,6 +45,7 @@ function CardAddButton() {
   return (
     <Button
       type="primary"
+      size="large"
       onClick={() => {
         router.push('/card-add')
       }}
@@ -56,7 +60,11 @@ function CardsListButton() {
   const router = useRouter()
 
   return (
-    <Button type="primary" onClick={() => router.push('/cards-list')}>
+    <Button
+      type="primary"
+      size="large"
+      onClick={() => router.push('/cards-list')}
+    >
       <SearchOutlined />
       cards list
     </Button>
@@ -66,9 +74,23 @@ function CardsListButton() {
 function CardsTrainButton() {
   const router = useRouter()
   return (
-    <Button type="primary" onClick={() => router.push('/training')}>
+    <Button
+      type="primary"
+      size="large"
+      onClick={() => router.push('/training')}
+    >
       <AimOutlined />
       training
+    </Button>
+  )
+}
+
+function StatsButton() {
+  const router = useRouter()
+  return (
+    <Button type="primary" size="large" onClick={() => router.push('/stats')}>
+      <BarChartOutlined />
+      stats
     </Button>
   )
 }
