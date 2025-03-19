@@ -20,9 +20,9 @@ async function handler(query: TTrainingSettingReq) {
   let cards: TCard[] = []
 
   const level = {
-    beginner: 0,
-    intermediate: [1, 2, 3],
-    advanced: 4,
+    beginner: 1,
+    intermediate: [2, 3, 4],
+    advanced: 5,
   }
 
   switch (query.trainingType) {
