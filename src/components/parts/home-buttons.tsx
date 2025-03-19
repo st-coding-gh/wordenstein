@@ -7,6 +7,7 @@ import {
   LogoutOutlined,
   PlusCircleOutlined,
   SearchOutlined,
+  SettingOutlined,
 } from '@ant-design/icons'
 
 export function ButtonGroup() {
@@ -17,6 +18,7 @@ export function ButtonGroup() {
         <CardAddButton />
         <CardsListButton />
         <StatsButton />
+        <SettingsButton />
         <Logout />
       </div>
     </div>
@@ -91,6 +93,20 @@ function StatsButton() {
     <Button type="primary" size="large" onClick={() => router.push('/stats')}>
       <BarChartOutlined />
       stats
+    </Button>
+  )
+}
+
+function SettingsButton() {
+  const router = useRouter()
+  return (
+    <Button
+      type="primary"
+      size="large"
+      onClick={() => router.push('/settings')}
+    >
+      <SettingOutlined />
+      settings
     </Button>
   )
 }

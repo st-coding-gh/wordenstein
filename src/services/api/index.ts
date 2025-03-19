@@ -79,6 +79,10 @@ class Api {
   async stats() {
     return (await this.fetch('stats')) as TStatsRes
   }
+
+  async downloadDatabase() {
+    return await this.fetch('settings/download-database', {}, 'output-raw')
+  }
 }
 
 export const api = new Api()
