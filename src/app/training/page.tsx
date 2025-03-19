@@ -3,7 +3,7 @@
 import { api } from '@/services/api'
 import { TTrainingSettingReq } from '@/types/api.types'
 import { TCard } from '@/types/card'
-import { TQuestionsType } from '@/types/training'
+import { TTrainingType } from '@/types/training'
 import { Button, Input, InputNumber, Radio } from 'antd'
 import React, { useEffect, useState } from 'react'
 import {
@@ -11,13 +11,14 @@ import {
   CardWord,
   CardImage,
   CardTranslation,
+  CardDefinition,
 } from '@/components/particles/card'
 
 export default function Train() {
-  const [settingLeastKnown, setSettingLeastKnown] = useState(15)
-  const [settingRandomCards, setSettingRandomCards] = useState(5)
-  const [settingQuestionsType, setSettingQuestionsType] =
-    useState<TQuestionsType>('english')
+  const [settingLimit, setSettingLimit] = useState<number | null>(null)
+  const [settingTrainingType, setSettingTrainingType] = useState<TTrainingType>(
+    'beginner-from-english'
+  )
   const [isSettingsDone, setIsSettingsDone] = useState(false)
   const [cardsSetIsLoading, setCardsSetIsLoading] = useState(false)
   const [cards, setCards] = useState<TCard[]>()
@@ -38,41 +39,39 @@ export default function Train() {
       {!isSettingsDone && (
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-3">
-            <SettingsLabel text="number of the least known words" />
-
-            <InputNumber
-              value={settingLeastKnown}
-              onChange={e => setSettingLeastKnown(e as number)}
-              size="large"
-            />
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <SettingsLabel text="number of random cards" />
-
-            <InputNumber
-              value={settingRandomCards}
-              onChange={e => setSettingRandomCards(e as number)}
-              size="large"
-            />
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <SettingsLabel text="what is shown as a question" />
+            <SettingsLabel text="training type" />
 
             <Radio.Group
-              onChange={e => setSettingQuestionsType(e.target.value)}
-              value={settingQuestionsType}
+              onChange={e => setSettingTrainingType(e.target.value)}
+              value={settingTrainingType}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 8,
               }}
             >
-              <Radio value="english">english</Radio>
-              <Radio value="russian">russian and image</Radio>
-              <Radio value="random">random</Radio>
+              <Radio value="beginner-from-english">beginner, english</Radio>
+              <Radio value="beginner-from-image-russian">
+                beginner, russian and image
+              </Radio>
+              <Radio value="intermediate-from-image-russian">
+                intermediate, russian and image
+              </Radio>
+              <Radio value="advanced-from-russian">advanced, russian</Radio>
+              <Radio value="advanced-from-definition">
+                advanced, definition
+              </Radio>
             </Radio.Group>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <SettingsLabel text="limit number of cards" />
+
+            <InputNumber
+              value={settingLimit}
+              onChange={e => setSettingLimit(e as number)}
+              size="large"
+            />
           </div>
 
           <Button
@@ -82,9 +81,10 @@ export default function Train() {
             onClick={async () => {
               setCardsSetIsLoading(true)
               const res = await api.trainingSet({
-                cardsLeastKnown: settingLeastKnown,
-                randomCards: settingRandomCards,
+                trainingType: settingTrainingType,
+                limit: settingLimit ? settingLimit : undefined,
               })
+
               setCards(res)
               setCardsSetIsLoading(false)
               setIsSettingsDone(true)
@@ -103,7 +103,7 @@ export default function Train() {
           <TrainingCard
             card={cards?.[currentCardIndex]}
             currentCardIndex={currentCardIndex}
-            settingQuestionsType={settingQuestionsType}
+            settingQuestionsType={settingTrainingType}
             setCurrentCardIndex={setCurrentCardIndex}
           />
         </div>
@@ -139,7 +139,7 @@ function TrainingCard({
 }: {
   card?: TCard
   currentCardIndex: number
-  settingQuestionsType: TQuestionsType
+  settingQuestionsType: TTrainingType
   setCurrentCardIndex: React.Dispatch<React.SetStateAction<number>>
 }) {
   const [isQuestion, setIsQuestion] = useState(true)
@@ -206,32 +206,47 @@ function TrainingQuestion({
   settingQuestionsType,
 }: {
   card: TCard
-  settingQuestionsType: TQuestionsType
+  settingQuestionsType: TTrainingType
 }) {
   switch (settingQuestionsType) {
-    case 'english':
-      return <QuestionEnglish card={card} />
-    case 'russian':
+    case 'beginner-from-english':
+      return <QuestionBeginnerEnglish card={card} />
+
+    case 'beginner-from-image-russian':
+      return <QuestionImageRussian card={card} />
+
+    case 'intermediate-from-image-russian':
+      return <QuestionImageRussian card={card} />
+
+    case 'advanced-from-russian':
       return <QuestionRussian card={card} />
-    case 'random':
-      const isEnglish = Math.random() > 0.5
-      return isEnglish ? (
-        <QuestionEnglish card={card} />
-      ) : (
-        <QuestionRussian card={card} />
-      )
+
+    case 'advanced-from-definition':
+      return <QuestionDefinition card={card} />
   }
 }
 
-function QuestionEnglish({ card }: { card: TCard }) {
+function QuestionBeginnerEnglish({ card }: { card: TCard }) {
   return <CardWord card={card} />
 }
 
-function QuestionRussian({ card }: { card: TCard }) {
+function QuestionImageRussian({ card }: { card: TCard }) {
   return (
     <>
       <CardImage card={card} />
       <CardTranslation card={card} />
     </>
   )
+}
+
+function QuestionRussian({ card }: { card: TCard }) {
+  return (
+    <>
+      <CardTranslation card={card} />
+    </>
+  )
+}
+
+function QuestionDefinition({ card }: { card: TCard }) {
+  return <CardDefinition card={card} />
 }

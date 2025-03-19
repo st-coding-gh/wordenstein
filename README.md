@@ -36,6 +36,6 @@ Your task is to explain the prompted word meaning in order to help me to improve
 ## 📘 plan
 
 - [ ] edit cards
-- [ ] markdown in all card sections
-- [ ] training mode with russian words only
-- [ ] training mode with words from the end of the list
+- [x] markdown in all card sections
+- [x] training mode with russian words only
+- [x] training mode with words from the end of the list

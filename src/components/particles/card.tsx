@@ -76,7 +76,12 @@ export function CardDefinition({ card }: { card: TCard }) {
       {card?.definition ? (
         <div>
           <CardHeading text="Definition" />
-          <p className="">{card.definition}</p>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeSanitize]}
+          >
+            {card.definition as string}
+          </ReactMarkdown>
         </div>
       ) : (
         <CardError message="definition not found" />
@@ -91,7 +96,12 @@ export function CardTranslation({ card }: { card: TCard }) {
       {card?.translation ? (
         <div>
           <CardHeading text="Translation" />
-          <p className="">{card.translation}</p>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeSanitize]}
+          >
+            {card.translation as string}
+          </ReactMarkdown>
         </div>
       ) : (
         <CardError message="translation not found" />
