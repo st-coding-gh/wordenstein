@@ -25,6 +25,19 @@ async function handler(query: TTrainingSettingReq) {
     advanced: 5,
   }
 
+  // get all unique values in correctAnswers column
+  const correctAnswersUniqueValues = (
+    await prisma.card.findMany({
+      select: { correctAnswers: true },
+      distinct: ['correctAnswers'],
+      orderBy: { correctAnswers: 'asc' },
+    })
+  ).map(card => card.correctAnswers)
+
+  const firstAdvancedCorrectScore = correctAnswersUniqueValues.filter(
+    answer => answer >= level.advanced
+  )[0]
+
   switch (query.trainingType) {
     case 'beginner-from-english':
       cards = await prisma.card.findMany({
@@ -53,7 +66,7 @@ async function handler(query: TTrainingSettingReq) {
     case 'advanced-from-russian':
       // where correctAnswers is greater or equal to 4
       cards = await prisma.card.findMany({
-        where: { correctAnswers: { gte: level.advanced } },
+        where: { correctAnswers: firstAdvancedCorrectScore },
         orderBy: { correctAnswers: 'asc' },
       })
       break
@@ -61,7 +74,7 @@ async function handler(query: TTrainingSettingReq) {
     case 'advanced-from-definition':
       // where correctAnswers is greater or equal to 4
       cards = await prisma.card.findMany({
-        where: { correctAnswers: { gte: level.advanced } },
+        where: { correctAnswers: firstAdvancedCorrectScore },
         orderBy: { correctAnswers: 'asc' },
       })
       break

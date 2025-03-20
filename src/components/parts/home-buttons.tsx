@@ -13,7 +13,7 @@ import {
 export function ButtonGroup() {
   return (
     <div className="lg:w-1/3 flex justify-end">
-      <div className="w-40 flex flex-col gap-3">
+      <div className="w-52 flex flex-col gap-3">
         <CardsTrainButton />
         <CardAddButton />
         <CardsListButton />
@@ -29,7 +29,6 @@ function Logout() {
   return (
     <Button
       type="primary"
-      size="large"
       onClick={async () => {
         const res = await api.logout()
         if (res) window.location.reload()
@@ -47,7 +46,6 @@ function CardAddButton() {
   return (
     <Button
       type="primary"
-      size="large"
       onClick={() => {
         router.push('/card-add')
       }}
@@ -62,11 +60,7 @@ function CardsListButton() {
   const router = useRouter()
 
   return (
-    <Button
-      type="primary"
-      size="large"
-      onClick={() => router.push('/cards-list')}
-    >
+    <Button type="primary" onClick={() => router.push('/cards-list')}>
       <SearchOutlined />
       cards list
     </Button>
@@ -76,11 +70,7 @@ function CardsListButton() {
 function CardsTrainButton() {
   const router = useRouter()
   return (
-    <Button
-      type="primary"
-      size="large"
-      onClick={() => router.push('/training')}
-    >
+    <Button type="primary" onClick={() => router.push('/training')}>
       <AimOutlined />
       training
     </Button>
@@ -90,7 +80,7 @@ function CardsTrainButton() {
 function StatsButton() {
   const router = useRouter()
   return (
-    <Button type="primary" size="large" onClick={() => router.push('/stats')}>
+    <Button type="primary" onClick={() => router.push('/stats')}>
       <BarChartOutlined />
       stats
     </Button>
@@ -100,11 +90,7 @@ function StatsButton() {
 function SettingsButton() {
   const router = useRouter()
   return (
-    <Button
-      type="primary"
-      size="large"
-      onClick={() => router.push('/settings')}
-    >
+    <Button type="primary" onClick={() => router.push('/settings')}>
       <SettingOutlined />
       settings
     </Button>

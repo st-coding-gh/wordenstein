@@ -9,9 +9,10 @@ export function AntdConfig({ children }: { children: React.ReactNode }) {
         theme={{
           components: {
             Button: {
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: 600,
               borderRadius: 12,
+              controlHeight: 40,
             },
           },
           token: {
