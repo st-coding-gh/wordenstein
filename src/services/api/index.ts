@@ -87,6 +87,10 @@ class Api {
   async cardUpdate(card: TCard) {
     return await this.fetch('card/update', card)
   }
+
+  async findSpoilers() {
+    return await this.fetch('settings/find-spoilers')
+  }
 }
 
 export const api = new Api()

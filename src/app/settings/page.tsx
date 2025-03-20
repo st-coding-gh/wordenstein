@@ -2,8 +2,10 @@
 
 import { api } from '@/services/api'
 import { Button } from 'antd'
+import { useRouter } from 'next/navigation'
 
 export default function SettingsPage() {
+  const router = useRouter()
   return (
     <div className="flex flex-col gap-10">
       <div>
@@ -31,6 +33,16 @@ export default function SettingsPage() {
           }}
         >
           download
+        </Button>
+      </div>
+
+      <div>
+        <SettingHeading>find spoilers</SettingHeading>
+        <Button
+          type="primary"
+          onClick={async () => router.push('/settings/spoilers')}
+        >
+          find
         </Button>
       </div>
     </div>
