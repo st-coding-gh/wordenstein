@@ -77,16 +77,25 @@ export default function CardAdd() {
         onChange={handleTextAreaChange}
       ></Input.TextArea>
 
-      {card && <Card card={card} />}
+      <div className="flex flex-row gap-2">
+        <Button
+          type="dashed"
+          className="w-fit"
+          onClick={() => fileInputRef.current && fileInputRef.current.click()}
+        >
+          choose image
+        </Button>
 
-      <input
-        type="file"
-        accept="image/png, image/jpeg, image/jpg, image/webp, image/gif, image/avif"
-        multiple={false}
-        ref={fileInputRef}
-        className="hidden"
-        onChange={handleFileChange}
-      />
+        <Button
+          type="primary"
+          className="w-fit"
+          onClick={() => {
+            handleUpload()
+          }}
+        >
+          add
+        </Button>
+      </div>
 
       {imagePreview && (
         <div className="">
@@ -98,23 +107,16 @@ export default function CardAdd() {
         </div>
       )}
 
-      <Button
-        type="dashed"
-        className="w-fit"
-        onClick={() => fileInputRef.current && fileInputRef.current.click()}
-      >
-        choose image
-      </Button>
+      {card && <Card card={card} />}
 
-      <Button
-        type="primary"
-        className="w-fit"
-        onClick={() => {
-          handleUpload()
-        }}
-      >
-        add
-      </Button>
+      <input
+        type="file"
+        accept="image/png, image/jpeg, image/jpg, image/webp, image/gif, image/avif"
+        multiple={false}
+        ref={fileInputRef}
+        className="hidden"
+        onChange={handleFileChange}
+      />
     </div>
   )
 }
