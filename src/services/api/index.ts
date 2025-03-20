@@ -83,6 +83,10 @@ class Api {
   async downloadDatabase() {
     return await this.fetch('settings/download-database', {}, 'output-raw')
   }
+
+  async cardUpdate(card: TCard) {
+    return await this.fetch('card/update', card)
+  }
 }
 
 export const api = new Api()
