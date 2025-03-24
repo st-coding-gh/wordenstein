@@ -36,4 +36,20 @@ export type TAnswerResultReq = {
 export type TStatsRes = {
   totalCards: number
   correctAnswersGroups: { correctAnswers: number; count: number }[]
+  vocabularyLength: number
+  unknownLength: number
+  possiblyUnknownLength: number
+  ignoredLength: number
 }
+
+export type TVocabularUnknownReq = { text: string }
+
+export type TWord = { id: string; word: string }
+
+export type TGetPossiblyUnknownRes = TWord[]
+
+export type TRecordKnownReq = TWord[]
+
+export type TRecordUnknownReq = TWord[]
+
+export type TRecordIgnoredReq = TWord[]

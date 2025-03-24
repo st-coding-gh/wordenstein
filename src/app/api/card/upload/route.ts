@@ -34,6 +34,16 @@ export async function POST(req: Request) {
       },
     })
 
+    // remove card word from unkwnown words
+    await prisma.wordsUnknown.deleteMany({ where: { word: card.word } })
+
+    // write to vocabulary
+    await prisma.vocabulary.create({
+      data: {
+        word: card.word,
+      },
+    })
+
     // Convert file to Buffer
     const fileBuffer = Buffer.from(await file.arrayBuffer())
 

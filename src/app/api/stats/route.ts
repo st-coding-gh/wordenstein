@@ -36,7 +36,19 @@ async function handler() {
     }))
     .sort((a, b) => a.correctAnswers - b.correctAnswers)
 
-  const res: TStatsRes = { totalCards, correctAnswersGroups }
+  const vocabularyLength = await prisma.vocabulary.count()
+  const unknownLength = await prisma.wordsUnknown.count()
+  const possiblyUnknownLength = await prisma.wordsPossiblyUnknown.count()
+  const ignoredLength = await prisma.wordsIgnored.count()
+
+  const res: TStatsRes = {
+    totalCards,
+    correctAnswersGroups,
+    vocabularyLength,
+    unknownLength,
+    possiblyUnknownLength,
+    ignoredLength,
+  }
 
   return res
 }

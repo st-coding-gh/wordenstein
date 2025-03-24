@@ -17,6 +17,7 @@
     "@ant-design/v5-patch-for-react-19": "^1.0.3",
     "@prisma/client": "^6.5.0",
     "@tailwindcss/postcss": "^4.0.12",
+    "@types/natural": "^5.1.5",
     "antd": "^5.24.3",
     "archiver": "^7.0.1",
     "bcryptjs": "^3.0.2",

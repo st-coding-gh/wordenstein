@@ -2,9 +2,15 @@ import {
   TAuthStatusRes,
   TCardAllRes,
   TCreateUserReq,
+  TGetPossiblyUnknownRes,
   TLoginReq,
+  TRecordIgnoredReq,
+  TRecordKnownReq,
+  TRecordUnknownReq,
   TStatsRes,
   TTrainingSettingReq,
+  TVocabularUnknownReq,
+  TWord,
 } from '@/types/api.types'
 import { TCard } from '@/types/card'
 
@@ -90,6 +96,56 @@ class Api {
 
   async findSpoilers() {
     return await this.fetch('settings/find-spoilers')
+  }
+
+  async findUnknownFromInput(query: TVocabularUnknownReq) {
+    return (await this.fetch('vocabular/unknown-from-input', query)) as string[]
+  }
+
+  async isOxfordRecorded() {
+    return (await this.fetch('settings/is-oxford-recorded')) as {
+      isOxfordRecorded: boolean
+    }
+  }
+
+  async recordOxford() {
+    return await this.fetch('vocabular/record-oxford')
+  }
+
+  async isCardsRecorded() {
+    return (await this.fetch('settings/is-cards-recorded')) as {
+      isCardsRecorded: boolean
+    }
+  }
+
+  async recordCards() {
+    return await this.fetch('vocabular/record-cards')
+  }
+
+  async getPossiblyUnknown() {
+    return (await this.fetch(
+      'vocabular/get-possibly-unknown'
+    )) as TGetPossiblyUnknownRes
+  }
+
+  async recordKnown(query: TRecordKnownReq) {
+    return (await this.fetch('vocabular/record-known', query)) as TWord[]
+  }
+
+  async recordUnknown(query: TRecordUnknownReq) {
+    return (await this.fetch('vocabular/record-unknown', query)) as TWord[]
+  }
+
+  async recordIgnored(query: TRecordIgnoredReq) {
+    return (await this.fetch('vocabular/record-ignore', query)) as TWord[]
+  }
+
+  async getUnknown() {
+    return (await this.fetch('vocabular/get-unknown')) as TWord[]
+  }
+
+  async deleteUnknown(query: TWord[]) {
+    return await this.fetch('vocabular/delete-unknown', query)
   }
 }
 

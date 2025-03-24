@@ -50,6 +50,47 @@ export default function Stats() {
               ></Table>
             </div>
           </div>
+
+          <div>
+            <StatsHeading>vocabulary</StatsHeading>
+            <div className="w-[30ch]">
+              <Table
+                columns={[
+                  {
+                    title: 'parameter',
+                    dataIndex: 'parameter',
+                    key: 'parameter',
+                  },
+                  {
+                    title: 'value',
+                    dataIndex: 'value',
+                    key: 'value',
+                  },
+                ]}
+                dataSource={[
+                  {
+                    parameter: 'vocabulary',
+                    value: stats?.vocabularyLength,
+                  },
+                  {
+                    parameter: 'unknown',
+                    value: stats?.unknownLength,
+                  },
+                  {
+                    parameter: 'possibly unknown',
+                    value: stats?.possiblyUnknownLength,
+                  },
+                  {
+                    parameter: 'ignored',
+                    value: stats?.ignoredLength,
+                  },
+                ]}
+                rowKey={'parameter'}
+                size="small"
+                pagination={false}
+              ></Table>
+            </div>
+          </div>
         </div>
       </Skeleton>
     </div>
