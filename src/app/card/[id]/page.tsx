@@ -3,7 +3,7 @@
 import { api } from '@/services/api'
 import { TCard } from '@/types/card'
 import { Button, Input, message, Skeleton } from 'antd'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Card } from '@/components/particles/card'
 import { EditOutlined } from '@ant-design/icons'
@@ -68,6 +68,7 @@ function Editing({
 }) {
   // connect to message api of antd
   const [messageApi, contextHolder] = message.useMessage()
+  const [deleteLoading, setDeleteLoading] = useState(false)
 
   return (
     <div className="flex flex-col gap-5">
@@ -150,25 +151,46 @@ function Editing({
         />
       </div>
 
-      <Button
-        type="primary"
-        className="w-fit"
-        onClick={async () => {
-          const res = await api.cardUpdate(card)
-          if (res) {
-            messageApi.open({
-              type: 'success',
-              content: 'saved',
-              duration: 1,
-              onClose: () => setIsEditing(false),
+      <div className="w-full flex flex-row justify-between">
+        <Button
+          type="primary"
+          className="w-fit"
+          onClick={async () => {
+            const res = await api.cardUpdate(card)
+            if (res) {
+              messageApi.open({
+                type: 'success',
+                content: 'saved',
+                duration: 1,
+                onClose: () => setIsEditing(false),
+              })
+            } else {
+              messageApi.open({ type: 'error', content: 'error' })
+            }
+          }}
+        >
+          save
+        </Button>
+
+        <Button
+          type="primary"
+          loading={deleteLoading}
+          danger
+          onClick={async () => {
+            setDeleteLoading(true)
+            if (!card.id) return
+            const res = await api.deleteCard({
+              id: card.id,
             })
-          } else {
-            messageApi.open({ type: 'error', content: 'error' })
-          }
-        }}
-      >
-        save
-      </Button>
+
+            console.log({ deleted: res })
+            setDeleteLoading(false)
+            window.location.href = '/cards-list'
+          }}
+        >
+          delete
+        </Button>
+      </div>
     </div>
   )
 }

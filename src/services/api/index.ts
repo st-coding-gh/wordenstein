@@ -1,6 +1,7 @@
 import {
   TAuthStatusRes,
   TCardAllRes,
+  TCardByIdReq,
   TCreateUserReq,
   TGetPossiblyUnknownRes,
   TLoginReq,
@@ -146,6 +147,10 @@ class Api {
 
   async deleteUnknown(query: TWord[]) {
     return await this.fetch('vocabular/delete-unknown', query)
+  }
+
+  async deleteCard(query: TCardByIdReq) {
+    return await this.fetch('card/delete', query)
   }
 }
 
