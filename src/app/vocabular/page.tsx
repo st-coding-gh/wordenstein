@@ -2,6 +2,7 @@
 
 import {
   FileUnknownOutlined,
+  FireOutlined,
   FormOutlined,
   VerifiedOutlined,
 } from '@ant-design/icons'
@@ -29,6 +30,12 @@ export default function Vocabular() {
         icon={<VerifiedOutlined />}
         label="unknown"
         action={() => router.push('/vocabular/unknown')}
+      />
+
+      <VocabularButton
+        icon={<FireOutlined />}
+        label="generate all unknown"
+        action={() => router.push('/vocabular/generate-all-unknown')}
       />
     </div>
   )

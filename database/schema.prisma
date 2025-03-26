@@ -55,3 +55,15 @@ model WordsUnknown {
   id   String @id @default(cuid())
   word String
 }
+
+model CardsGenerationLog {
+  id                 Int      @id @default(autoincrement())
+  dateTime           String
+  isFinished         Boolean  @default(false)
+  isSuccess          Boolean?
+  totalCards         Int
+  generatedCards     Int?
+  totalTimeMs        Int?
+  estimatedEndTimeMs Int?
+  errorMessage       String?
+}

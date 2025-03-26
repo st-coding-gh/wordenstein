@@ -1,0 +1,9 @@
+{
+  "created": 1708501063,
+  "data": [
+    {
+      "b64_json": "test"
+    }
+  ],
+  "model": "img-stable\/stable-diffusion-xl-1024"
+}

@@ -1,7 +1,7 @@
 'use client'
 
 import { api } from '@/services/api'
-import { Button, Skeleton } from 'antd'
+import { Button, Skeleton, message } from 'antd'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -9,6 +9,8 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [isOxfordRecorded, setIsOxfordRecorded] = useState(false)
   const [isCardsRecorded, setIsCardsRecorded] = useState(false)
+  const router = useRouter()
+  const [messageApi, contextHolder] = message.useMessage()
 
   async function checkSettings(): Promise<{
     isOxfordRecorded: boolean
@@ -29,13 +31,78 @@ export default function SettingsPage() {
 
   return (
     <Skeleton loading={loading} active>
+      {contextHolder}
       <div className="flex flex-col gap-10">
         <DownloadDatabase />
         <Spoilers />
         {!isOxfordRecorded && <RecordOxford />}
         {!isCardsRecorded && <RecordCards />}
+        <DeleteUnknown />
+        <DeletePossiblyUnknown />
       </div>
     </Skeleton>
+  )
+}
+
+function DeletePossiblyUnknown() {
+  const [messageApi, contextHolder] = message.useMessage()
+  const [loading, setLoading] = useState(false)
+
+  return (
+    <div>
+      {contextHolder}
+      <SettingHeading>delete all possibly unknown</SettingHeading>
+      <Button
+        type="primary"
+        loading={loading}
+        danger
+        onClick={async () => {
+          setLoading(true)
+          const res = await api.deleteAllPossiblyUnknown()
+          if (res) {
+            messageApi.open({
+              type: 'success',
+              content: 'deleted successfully',
+            })
+          }
+          setLoading(false)
+        }}
+      >
+        delete
+      </Button>
+    </div>
+  )
+}
+
+function DeleteUnknown() {
+  const [loading, setLoading] = useState(false)
+  const [messageApi, contextHolder] = message.useMessage()
+
+  return (
+    <div>
+      {contextHolder}
+      <SettingHeading>delete all unknown</SettingHeading>
+      <Button
+        type="primary"
+        loading={loading}
+        danger
+        onClick={async () => {
+          setLoading(true)
+          const res = await api.deleteAllUnknown()
+
+          if (res) {
+            messageApi.open({
+              type: 'success',
+              content: 'deleted successfully',
+            })
+          }
+
+          setLoading(false)
+        }}
+      >
+        delete
+      </Button>
+    </div>
   )
 }
 

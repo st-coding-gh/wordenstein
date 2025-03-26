@@ -53,3 +53,17 @@ export type TRecordKnownReq = TWord[]
 export type TRecordUnknownReq = TWord[]
 
 export type TRecordIgnoredReq = TWord[]
+
+export type TGenerateUnknownLog = {
+  id: number
+  dateTime: string
+  isFinished: boolean
+  isSuccess: boolean
+  totalCards: number
+  generatedCards: number
+  totalTimeMs: number
+  estimatedEndTimeMs: number
+  errorMessage: string
+}
+
+export type TGenerateUnknownLogs = TGenerateUnknownLog[]

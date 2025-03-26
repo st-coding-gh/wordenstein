@@ -3,6 +3,7 @@ import {
   TCardAllRes,
   TCardByIdReq,
   TCreateUserReq,
+  TGenerateUnknownLogs,
   TGetPossiblyUnknownRes,
   TLoginReq,
   TRecordIgnoredReq,
@@ -151,6 +152,28 @@ class Api {
 
   async deleteCard(query: TCardByIdReq) {
     return await this.fetch('card/delete', query)
+  }
+
+  async gptTest() {
+    return await this.fetch('gpt/test')
+  }
+
+  async deleteAllUnknown() {
+    return await this.fetch('vocabular/delete-unknown-all')
+  }
+
+  async deleteAllPossiblyUnknown() {
+    return await this.fetch('vocabular/delete-possibly-unknown-all')
+  }
+
+  async generateAllUnknown() {
+    return await this.fetch('vocabular/generate-all-unknown')
+  }
+
+  async getGenerateUnknownLogs() {
+    return (await this.fetch(
+      'vocabular/generate-unknown-log'
+    )) as TGenerateUnknownLogs
   }
 }
 
