@@ -10,13 +10,12 @@ export default function Unknown() {
   const [unknown, setUnknown] = useState<TGetPossiblyUnknownRes>([])
   const [checkedValues, setCheckedValues] = useState<TGetPossiblyUnknownRes>([])
   const [total, setTotal] = useState(0)
-  const limit = 100
 
   useEffect(() => {
     api.getUnknown().then(res => {
       setCheckedValues([])
       setTotal(res.length)
-      setUnknown(res.slice(0, limit))
+      setUnknown(res)
       setLoading(false)
     })
   }, [])
