@@ -35,7 +35,18 @@ Your task is to explain the prompted word meaning in order to help me to improve
 
 ## 📘 plan
 
-- [ ] edit cards
+- [x] edit cards
 - [x] markdown in all card sections
 - [x] training mode with russian words only
 - [x] training mode with words from the end of the list
+- [ ] replace images
+- [ ] stats on size of the database and size of images
+- [ ] check duplicates in vocabulary
+
+## 📝 notes
+
+money before: 688
+monet after: 421
+spent: 267
+cards generated: 212
+money per card: 267 / 212 = 1.26

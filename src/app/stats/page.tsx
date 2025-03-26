@@ -91,6 +91,16 @@ export default function Stats() {
               ></Table>
             </div>
           </div>
+
+          <div>
+            <StatsHeading>database size</StatsHeading>
+            <p>{stats?.databaseSize.toFixed(2) + ' MB'}</p>
+          </div>
+
+          <div>
+            <StatsHeading>images size</StatsHeading>
+            <p>{stats?.imagesSize.toFixed(2) + ' MB'}</p>
+          </div>
         </div>
       </Skeleton>
     </div>

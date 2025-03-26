@@ -1,6 +1,11 @@
 import { prisma } from '@/services/prisma'
 import { TStatsRes } from '@/types/api.types'
 import { NextResponse } from 'next/server'
+import path from 'path'
+import dotenv from 'dotenv'
+import fs from 'fs'
+
+dotenv.config()
 
 export async function POST(req: Request) {
   const body = await req.json()
@@ -40,6 +45,8 @@ async function handler() {
   const unknownLength = await prisma.wordsUnknown.count()
   const possiblyUnknownLength = await prisma.wordsPossiblyUnknown.count()
   const ignoredLength = await prisma.wordsIgnored.count()
+  const databaseSize = calculateDatabaseSize()
+  const imagesSize = calculateSizeOfImages()
 
   const res: TStatsRes = {
     totalCards,
@@ -48,7 +55,40 @@ async function handler() {
     unknownLength,
     possiblyUnknownLength,
     ignoredLength,
+    databaseSize,
+    imagesSize,
   }
 
   return res
+}
+
+function calculateDatabaseSize() {
+  const databaseNameFromEnv = process.env.DATABASE_URL
+  // extract name of the file from a string lile: "file:./dev.db"
+  const match = databaseNameFromEnv?.match(/file:\.\/(.+\.db)/)
+  const databaseName = match ? match[1] : ''
+  const databasePath = path.join(process.cwd(), 'database', databaseName)
+
+  const stats = fs.statSync(databasePath)
+  const sizeInBytes = stats.size
+  const sizeInMB = sizeInBytes / (1024 * 1024)
+
+  return sizeInMB
+}
+
+function calculateSizeOfImages() {
+  const imagesPath = path.join(process.cwd(), 'uploads/images/cards')
+
+  const files = fs.readdirSync(imagesPath)
+  let size = 0
+
+  for (const file of files) {
+    const filePath = path.join(imagesPath, file)
+    const stats = fs.statSync(filePath)
+    size += stats.size
+  }
+
+  const sizeInMb = size / (1024 * 1024)
+
+  return sizeInMb
 }

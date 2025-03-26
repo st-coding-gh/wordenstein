@@ -40,6 +40,8 @@ export type TStatsRes = {
   unknownLength: number
   possiblyUnknownLength: number
   ignoredLength: number
+  databaseSize: number
+  imagesSize: number
 }
 
 export type TVocabularUnknownReq = { text: string }
