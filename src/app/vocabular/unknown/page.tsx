@@ -44,7 +44,7 @@ export default function Unknown() {
               <Input
                 placeholder="new unknown word"
                 value={input}
-                onChange={e => setInput(e.target.value.trim().toLowerCase())}
+                onChange={e => setInput(e.target.value)}
               />
               <Button
                 type="primary"
@@ -52,7 +52,7 @@ export default function Unknown() {
                 onClick={async () => {
                   const res = await api.recordUnknown([
                     {
-                      word: input,
+                      word: input.toLowerCase().trim(),
                       id: Math.random().toString(36).substring(2, 15),
                     },
                   ])
