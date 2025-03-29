@@ -50,8 +50,12 @@ export default function CardAdd() {
         })
       }
     } catch (error) {
+      const err = error as Error
       console.error('Error uploading file:', error)
-      messageApi.open({ type: 'error', content: 'Upload error' })
+      messageApi.open({
+        type: 'error',
+        content: `Upload error: ${err.message}`,
+      })
     }
   }
 

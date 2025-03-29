@@ -1,13 +1,14 @@
 'use client'
 
 import { api } from '@/services/api'
-import { Button, Skeleton } from 'antd'
+import { Button, Input, Skeleton } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { TGetPossiblyUnknownRes, TWord } from '@/types/api.types'
 
 export default function Unknown() {
   const [loading, setLoading] = useState(true)
   const [unknown, setUnknown] = useState<TGetPossiblyUnknownRes>([])
+  const [input, setInput] = useState('')
   const [checkedValues, setCheckedValues] = useState<TGetPossiblyUnknownRes>([])
   const [total, setTotal] = useState(0)
 
@@ -36,6 +37,31 @@ export default function Unknown() {
             >
               known
             </Button>
+          </div>
+
+          <div>
+            <div className="flex flex-row gap-3">
+              <Input
+                placeholder="new unknown word"
+                value={input}
+                onChange={e => setInput(e.target.value.trim().toLowerCase())}
+              />
+              <Button
+                type="primary"
+                className="w-fit"
+                onClick={async () => {
+                  const res = await api.recordUnknown([
+                    {
+                      word: input,
+                      id: Math.random().toString(36).substring(2, 15),
+                    },
+                  ])
+                  window.location.reload()
+                }}
+              >
+                add
+              </Button>
+            </div>
           </div>
 
           <div className="bg-app-warning rounded-3xl">
