@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start -p 8080",
-    "lint": "next lint"
+    "lint": "next lint",
+    "draft-scripts": "bun ./_drafts/scripts"
   },
   "prisma": {
     "schema": "./database/schema.prisma"

@@ -175,6 +175,10 @@ class Api {
       'vocabular/generate-unknown-log'
     )) as TGenerateUnknownLogs
   }
+
+  async fixNewLines() {
+    return await this.fetch('settings/fix-new-lines')
+  }
 }
 
 export const api = new Api()

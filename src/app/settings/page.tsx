@@ -35,12 +35,41 @@ export default function SettingsPage() {
       <div className="flex flex-col gap-10">
         <DownloadDatabase />
         <Spoilers />
-        {!isOxfordRecorded && <RecordOxford />}
-        {!isCardsRecorded && <RecordCards />}
+        <FixNewLines />
         <DeleteUnknown />
         <DeletePossiblyUnknown />
+
+        {/*  */}
+        {!isOxfordRecorded && <RecordOxford />}
+        {!isCardsRecorded && <RecordCards />}
       </div>
     </Skeleton>
+  )
+}
+
+function FixNewLines() {
+  const [loading, setLoading] = useState(false)
+  const [messageApi, contextHolder] = message.useMessage()
+
+  return (
+    <div>
+      {contextHolder}
+      <SettingHeading>fix new lines</SettingHeading>
+      <Button
+        type="primary"
+        loading={loading}
+        danger
+        onClick={async () => {
+          setLoading(true)
+          const res = await api.fixNewLines()
+          setLoading(false)
+          messageApi.open({ type: 'success', content: res.message })
+          console.log(res)
+        }}
+      >
+        fix
+      </Button>
+    </div>
   )
 }
 
