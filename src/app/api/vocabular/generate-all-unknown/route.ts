@@ -24,12 +24,29 @@ export async function POST(req: NextRequest) {
 }
 
 async function handler() {
+  //check if there is a generation in process:
+  const isGenerationProcess = await isGenerationInProcess()
+  if (isGenerationProcess) {
+    return {
+      message: 'there is already a generation in process',
+    }
+  }
+
   //start the process which will continue on the background:
   generateAllUnknown()
-
   return {
     message: 'the generation has been started',
   }
+}
+
+async function isGenerationInProcess() {
+  const isFinishedExist = await prisma.cardsGenerationLog.findFirst({
+    where: {
+      isFinished: false,
+    },
+  })
+
+  return !!isFinishedExist
 }
 
 async function generateAllUnknown() {

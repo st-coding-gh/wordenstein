@@ -37,12 +37,12 @@ export default function RootLayout({
         <AntdRegistry>
           <AntdConfig>
             <Auth>
-              <div className="absolute w-full top-0 h-24 flex items-center justify-center border-b-4 border-app-primary">
+              <div className="absolute w-full top-0 h-16 flex items-center justify-center border-b-4 border-app-primary">
                 <Link href={'/'}>
                   <Logo />
                 </Link>
               </div>
-              <div className="pt-28 px-3 lg:px-10 pb-10">
+              <div className="pt-20 px-3 lg:px-10 pb-10">
                 <div className="max-w-[1000px] mx-auto">{children}</div>
               </div>
             </Auth>
