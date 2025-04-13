@@ -1,6 +1,6 @@
 export function Logo() {
   return (
-    <div className="w-40 h-24 flex items-end justify-center ">
+    <div className="w-40 h-20 flex items-end justify-center ">
       <LogoSVG />
     </div>
   )

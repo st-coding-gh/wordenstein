@@ -18,7 +18,9 @@ export async function POST(req: NextRequest) {
 }
 
 async function handler() {
-  const allLogs = await prisma.cardsGenerationLog.findMany()
+  const allLogs = await prisma.cardsGenerationLog.findMany({
+    orderBy: { dateTime: 'desc' },
+  })
 
   return allLogs
 }

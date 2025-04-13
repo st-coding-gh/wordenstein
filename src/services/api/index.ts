@@ -179,6 +179,10 @@ class Api {
   async fixNewLines() {
     return await this.fetch('settings/fix-new-lines')
   }
+
+  async deleteDuplicateCards() {
+    return await this.fetch('card/delete-duplicates')
+  }
 }
 
 export const api = new Api()

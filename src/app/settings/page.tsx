@@ -1,7 +1,7 @@
 'use client'
 
 import { api } from '@/services/api'
-import { Button, Skeleton, message } from 'antd'
+import { Button, Skeleton, message, Collapse, Divider } from 'antd'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -35,15 +35,54 @@ export default function SettingsPage() {
       <div className="flex flex-col gap-10">
         <DownloadDatabase />
         <Spoilers />
-        <FixNewLines />
-        <DeleteUnknown />
-        <DeletePossiblyUnknown />
+
+        <Collapse
+          items={[
+            {
+              key: '1',
+              label: '⚡ danger actions',
+              children: (
+                <div className="flex flex-col gap-10">
+                  <DeleteDuplicateCards />
+                  <FixNewLines />
+                  <DeleteUnknown />
+                  <DeletePossiblyUnknown />
+                </div>
+              ),
+            },
+          ]}
+        />
 
         {/*  */}
         {!isOxfordRecorded && <RecordOxford />}
         {!isCardsRecorded && <RecordCards />}
       </div>
     </Skeleton>
+  )
+}
+
+function DeleteDuplicateCards() {
+  const [loading, setLoading] = useState(false)
+  const [messageApi, contextHolder] = message.useMessage()
+  return (
+    <div>
+      {contextHolder}
+      <SettingHeading>delete duplicates</SettingHeading>
+
+      <Button
+        type="primary"
+        danger
+        loading={loading}
+        onClick={async () => {
+          setLoading(true)
+          const res = await api.deleteDuplicateCards()
+          messageApi.open({ type: 'success', content: res.message })
+          setLoading(false)
+        }}
+      >
+        delete
+      </Button>
+    </div>
   )
 }
 
