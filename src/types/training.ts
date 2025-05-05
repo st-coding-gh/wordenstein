@@ -4,3 +4,4 @@ export type TTrainingType =
   | 'intermediate-from-image-russian'
   | 'advanced-from-russian'
   | 'advanced-from-definition'
+  | 'advanced-from-english'

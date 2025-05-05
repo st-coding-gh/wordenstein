@@ -13,6 +13,7 @@ import {
   CardTranslation,
   CardDefinition,
 } from '@/components/particles/card'
+import Stats from '../stats/page'
 
 export default function Train() {
   const [settingLimit, setSettingLimit] = useState<number | null>(null)
@@ -61,6 +62,7 @@ export default function Train() {
               <Radio value="advanced-from-definition">
                 advanced, definition
               </Radio>
+              <Radio value='advanced-from-english'>advanced, english</Radio>
             </Radio.Group>
           </div>
 
@@ -92,14 +94,21 @@ export default function Train() {
           >
             Start training
           </Button>
+
+          <Stats display={{
+            correct_answers: true,
+            database_size: false,
+            images_size: false,
+            total_cards: false,
+            vocabulary: false
+          }} />
         </div>
       )}
 
       {isSettingsDone && !isTrainingDone && (
         <div className="flex flex-col gap-5">
-          <p className="text-app-info font-bold">{`${
-            currentCardIndex + 1
-          } card of ${cards?.length}`}</p>
+          <p className="text-app-info font-bold">{`${currentCardIndex + 1
+            } card of ${cards?.length}`}</p>
           <TrainingCard
             card={cards?.[currentCardIndex]}
             currentCardIndex={currentCardIndex}
@@ -223,6 +232,9 @@ function TrainingQuestion({
 
     case 'advanced-from-definition':
       return <QuestionDefinition card={card} />
+
+    case 'advanced-from-english':
+      return <QuestionEnglish card={card} />
   }
 }
 
@@ -249,4 +261,8 @@ function QuestionRussian({ card }: { card: TCard }) {
 
 function QuestionDefinition({ card }: { card: TCard }) {
   return <CardDefinition card={card} />
+}
+
+function QuestionEnglish({ card }: { card: TCard }) {
+  return <CardWord card={card} />
 }

@@ -78,6 +78,14 @@ async function handler(query: TTrainingSettingReq) {
         orderBy: { correctAnswers: 'asc' },
       })
       break
+
+    case 'advanced-from-english':
+      // where correctAnswers is greater or equal to 4
+      cards = await prisma.card.findMany({
+        where: { correctAnswers: firstAdvancedCorrectScore },
+        orderBy: { correctAnswers: 'asc' },
+      })
+      break
   }
 
   const shuffled = cards.sort(() => Math.random() - 0.5)
