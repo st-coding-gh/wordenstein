@@ -13,7 +13,7 @@ import {
   CardTranslation,
   CardDefinition,
 } from '@/components/particles/card'
-import Stats from '../stats/page'
+import { StatsComponent } from '@/components/parts/stats'
 
 export default function Train() {
   const [settingLimit, setSettingLimit] = useState<number | null>(null)
@@ -95,7 +95,7 @@ export default function Train() {
             Start training
           </Button>
 
-          <Stats display={{
+          <StatsComponent display={{
             correct_answers: true,
             database_size: false,
             images_size: false,
