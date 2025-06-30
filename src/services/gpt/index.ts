@@ -58,15 +58,13 @@ class GPT {
       model: 'img-stable/stable-diffusion-xl-1024',
       prompt: prompt,
       response_format: 'b64_json',
-    })) as unknown as string
-
-    const resToJson = JSON.parse(req) as {
+    })) as unknown as {
       created: number
       data: { b64_json: string }[]
       model: string
     }
 
-    const imageJson = resToJson.data[0].b64_json
+    const imageJson = req.data[0].b64_json
 
     return imageJson
   }

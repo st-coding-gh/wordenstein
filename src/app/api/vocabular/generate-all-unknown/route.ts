@@ -104,6 +104,7 @@ async function generateAllUnknown() {
       })
     } catch (e) {
       const error = e as Error
+
       const messageToLog = {
         generatedCardWord: unknown.word,
         error: error.message,
