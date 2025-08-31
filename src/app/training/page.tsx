@@ -100,7 +100,8 @@ export default function Train() {
             database_size: false,
             images_size: false,
             total_cards: false,
-            vocabulary: false
+            vocabulary: false,
+            generation_log: false
           }} />
         </div>
       )}
