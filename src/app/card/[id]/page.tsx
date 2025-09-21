@@ -2,11 +2,12 @@
 
 import { api } from '@/services/api'
 import { TCard } from '@/types/card'
-import { Button, Input, message, Skeleton } from 'antd'
+import { Button, Input, message, Skeleton, Upload } from 'antd'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Card } from '@/components/particles/card'
-import { EditOutlined } from '@ant-design/icons'
+import { EditOutlined, UploadOutlined } from '@ant-design/icons'
+import type { UploadFile } from 'antd'
 
 export default function CardDetail() {
   const [loading, setLoading] = useState(true)
@@ -69,11 +70,73 @@ function Editing({
   // connect to message api of antd
   const [messageApi, contextHolder] = message.useMessage()
   const [deleteLoading, setDeleteLoading] = useState(false)
+  const [uploadLoading, setUploadLoading] = useState(false)
+
+  const handleImageUpload = async (file: File) => {
+    if (!card.id) return false
+
+    setUploadLoading(true)
+    try {
+      const formData = new FormData()
+      formData.append('image', file)
+      formData.append('cardId', card.id)
+
+      const response = await api.cardAddImage(formData)
+      const result = await response.json()
+
+      if (response.ok) {
+        messageApi.open({
+          type: 'success',
+          content: `Image added successfully! Total: ${result.totalImages} images`,
+        })
+
+        // Refresh card data to show new image
+        if (card.id) {
+          const updatedCard = await api.cardById(card.id)
+          setCard(updatedCard)
+        }
+      } else {
+        messageApi.open({
+          type: 'error',
+          content: 'Failed to add image: ' + result.error,
+        })
+      }
+    } catch (error) {
+      messageApi.open({
+        type: 'error',
+        content: 'Error uploading image',
+      })
+    }
+    setUploadLoading(false)
+    return false // Prevent default upload behavior
+  }
 
   return (
     <div className="flex flex-col gap-5">
       {contextHolder}
       <h1 className="text-4xl font-black text-app-secondary">editing mode</h1>
+
+      {/* Image Upload Section */}
+      <div>
+        <EditHeading text="add new image" />
+        <Upload
+          beforeUpload={handleImageUpload}
+          showUploadList={false}
+          accept="image/*"
+          disabled={uploadLoading}
+        >
+          <Button
+            icon={<UploadOutlined />}
+            loading={uploadLoading}
+            className="w-full"
+          >
+            {uploadLoading ? 'Uploading...' : 'Add Image'}
+          </Button>
+        </Upload>
+        <div className="text-xs text-gray-500 mt-1">
+          Current images: {card.image && Array.isArray(card.image) ? card.image.length : (card.id ? 1 : 0)}
+        </div>
+      </div>
 
       <div>
         <EditHeading text="word" />

@@ -16,9 +16,16 @@ export async function POST(req: NextRequest) {
 }
 
 async function handler(body: TCard) {
+  // Extract and process the data to ensure proper types for Prisma
+  const { id, image, ...updateData } = body
+
   const card = await prisma.card.update({
-    where: { id: body.id },
-    data: { ...body },
+    where: { id },
+    data: {
+      ...updateData,
+      // Handle image field properly for Prisma JsonValue
+      ...(image !== undefined && { image: image as any })
+    },
   })
 
   return card

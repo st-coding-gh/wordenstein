@@ -45,6 +45,8 @@ export default function SettingsPage() {
                 <div className="flex flex-col gap-10">
                   <DeleteDuplicateCards />
                   <FixNewLines />
+                  <MigrateCardImages />
+                  <CleanupOrphanedImages />
                   <DeleteUnknown />
                   <DeletePossiblyUnknown />
                 </div>
@@ -254,6 +256,82 @@ function DownloadDatabase() {
         }}
       >
         download
+      </Button>
+    </div>
+  )
+}
+
+function MigrateCardImages() {
+  const [loading, setLoading] = useState(false)
+  const [messageApi, contextHolder] = message.useMessage()
+
+  return (
+    <div>
+      {contextHolder}
+      <SettingHeading>migrate card images</SettingHeading>
+      <div className="text-sm text-gray-600 mb-2">
+        Migrates current card IDs to new image array format. Safe to run multiple times.
+      </div>
+      <Button
+        type="primary"
+        loading={loading}
+        danger
+        onClick={async () => {
+          setLoading(true)
+          try {
+            const res = await api.migrateCardImages()
+            messageApi.open({
+              type: 'success',
+              content: res.message || `Migrated ${res.migratedCount} cards`
+            })
+          } catch (error) {
+            messageApi.open({
+              type: 'error',
+              content: 'Failed to migrate card images'
+            })
+          }
+          setLoading(false)
+        }}
+      >
+        migrate
+      </Button>
+    </div>
+  )
+}
+
+function CleanupOrphanedImages() {
+  const [loading, setLoading] = useState(false)
+  const [messageApi, contextHolder] = message.useMessage()
+
+  return (
+    <div>
+      {contextHolder}
+      <SettingHeading>cleanup orphaned images</SettingHeading>
+      <div className="text-sm text-gray-600 mb-2">
+        Removes image files that are no longer referenced by any cards. This operation cannot be undone.
+      </div>
+      <Button
+        type="primary"
+        loading={loading}
+        danger
+        onClick={async () => {
+          setLoading(true)
+          try {
+            const res = await api.cleanupOrphanedImages()
+            messageApi.open({
+              type: 'success',
+              content: res.message || `Cleaned up ${res.deletedCount} orphaned images`
+            })
+          } catch (error) {
+            messageApi.open({
+              type: 'error',
+              content: 'Failed to cleanup orphaned images'
+            })
+          }
+          setLoading(false)
+        }}
+      >
+        cleanup
       </Button>
     </div>
   )

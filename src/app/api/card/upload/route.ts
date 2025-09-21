@@ -5,6 +5,7 @@ import path from 'path'
 import sharp from 'sharp'
 import { TCard } from '@/types/card'
 import { prisma } from '@/services/prisma'
+import { randomUUID } from 'crypto'
 
 // Ensure the upload directory exists
 const uploadDir = path.join(process.cwd(), 'uploads/images/cards')
@@ -26,11 +27,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing card data' }, { status: 400 })
     }
 
-    // create card record in the database
+    // Generate unique image ID
+    const imageId = randomUUID()
+
+    // create card record in the database with image ID
     const cardRecord = await prisma.card.create({
       data: {
         ...card,
         correctAnswers: 0,
+        image: [imageId], // Store the unique image ID in the array
       },
     })
 
@@ -47,8 +52,8 @@ export async function POST(req: Request) {
     // Convert file to Buffer
     const fileBuffer = Buffer.from(await file.arrayBuffer())
 
-    // Generate final filename
-    const finalFileName = `${cardRecord.id}.webp`
+    // Generate final filename using unique image ID
+    const finalFileName = `${imageId}.webp`
     const finalFilePath = path.join(uploadDir, finalFileName)
 
     // Process image: Resize and convert to WebP

@@ -107,3 +107,26 @@ body {
   color: var(--color-foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Card Image Carousel Styles */
+.card-image-carousel .ant-carousel-content {
+  display: flex;
+  align-items: stretch;
+}
+
+.card-image-carousel .slick-slide {
+  display: flex !important;
+  align-items: stretch;
+}
+
+.card-image-carousel .slick-slide > div {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+}
+
+.card-image-carousel img {
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+}

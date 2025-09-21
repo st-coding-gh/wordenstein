@@ -183,6 +183,21 @@ class Api {
   async deleteDuplicateCards() {
     return await this.fetch('card/delete-duplicates')
   }
+
+  async migrateCardImages() {
+    return await this.fetch('card/migrate-images')
+  }
+
+  async cleanupOrphanedImages() {
+    return await this.fetch('settings/cleanup-orphaned-images')
+  }
+
+  async cardAddImage(formData: FormData) {
+    return await fetch('/api/card/add-image', {
+      method: 'POST',
+      body: formData,
+    })
+  }
 }
 
 export const api = new Api()

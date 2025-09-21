@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSanitize from 'rehype-sanitize'
 import Image from 'next/image'
+import { Carousel } from 'antd'
 
 export function Card({ card }: { card: TCard }) {
   return (
@@ -44,13 +45,83 @@ export function CardWord({ card }: { card: TCard }) {
 
 export function CardImage({ card }: { card: TCard }) {
   if (!card.id) return null
+
+  // Get image IDs from card.image array, with fallback to legacy system
+  const getImageIds = (): string[] => {
+    if (card.image && Array.isArray(card.image) && card.image.length > 0) {
+      return card.image
+    }
+    // Fallback: use card ID for legacy system
+    return [card.id!]
+  }
+
+  const imageIds = getImageIds()
+
+  if (imageIds.length === 1) {
+    // Single image - display normally
+    return (
+      <div className="w-full max-w-[500px] rounded-lg overflow-hidden">
+        <img
+          src={`/api/image/${imageIds[0]}`}
+          alt={card.imagePrompt}
+          className="w-full"
+          onError={(e) => {
+            // Fallback to legacy API if direct image API fails
+            const target = e.target as HTMLImageElement
+            target.src = `/api/card/image/${card.id}`
+          }}
+        />
+      </div>
+    )
+  }
+
+  // Multiple images - display with carousel
   return (
-    <div className="w-full max-w-[500px] rounded-lg overflow-hidden">
-      <img
-        src={`/api/card/image/${card.id}`}
-        alt={card.imagePrompt}
-        className="w-full"
-      />
+    <div className="w-full max-w-[1000px] rounded-lg overflow-hidden">
+      <Carousel
+        dots={true}
+        arrows={true}
+        autoplay={false}
+        slidesToShow={2}
+        slidesToScroll={2}
+        responsive={[
+          {
+            breakpoint: 768, // md breakpoint
+            settings: {
+              slidesToShow: 1,
+              slidesToScroll: 1,
+            }
+          }
+        ]}
+        className="card-image-carousel"
+      >
+        {imageIds.map((imageId, index) => (
+          <div key={imageId} className="px-1">
+            <img
+              src={`/api/image/${imageId}`}
+              alt={`${card.imagePrompt} - Image ${index + 1}`}
+              className="w-full h-auto object-cover rounded"
+              onError={(e) => {
+                // Fallback for legacy images
+                const target = e.target as HTMLImageElement
+                if (imageId === card.id) {
+                  target.src = `/api/card/image/${card.id}`
+                }
+              }}
+            />
+          </div>
+        ))}
+      </Carousel>
+
+      {/* Image counter */}
+      <div className="text-center text-sm text-gray-500 mt-2">
+        {imageIds.length} image{imageIds.length > 1 ? 's' : ''}
+        {imageIds.length > 2 && (
+          <span className="ml-1 text-xs">
+            (showing {Math.min(2, imageIds.length)} at once on large screens)
+          </span>
+        )}
+      </div>
     </div>
   )
 }

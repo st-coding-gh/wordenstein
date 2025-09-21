@@ -45,6 +45,7 @@ _drafts
 
 # database
 dev.db
+prod.db
 
 # uploads
 uploads

@@ -33,6 +33,7 @@ model Card {
   examplesBestChoice    String
   examplesNotBestChoice String
   imagePrompt           String
+  image                 Json?
   correctAnswers        Int
 }
 

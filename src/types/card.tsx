@@ -8,5 +8,6 @@ export type TCard = {
   examplesBestChoice: string
   examplesNotBestChoice: string
   imagePrompt: string
+  image?: any // JsonValue from Prisma - can be string[], null, or other JSON types
   correctAnswers?: number
 }
