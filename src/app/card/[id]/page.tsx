@@ -5,7 +5,7 @@ import { TCard } from '@/types/card'
 import { Button, Input, message, Skeleton, Upload } from 'antd'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Card } from '@/components/particles/card'
+import { Card, CardImage } from '@/components/particles/card'
 import { EditOutlined, UploadOutlined } from '@ant-design/icons'
 import type { UploadFile } from 'antd'
 
@@ -136,6 +136,22 @@ function Editing({
         <div className="text-xs text-gray-500 mt-1">
           Current images: {card.image && Array.isArray(card.image) ? card.image.length : (card.id ? 1 : 0)}
         </div>
+      </div>
+
+      {/* Current Images with Delete Option */}
+      <div>
+        <EditHeading text="current images" />
+        <CardImage
+          card={card}
+          isEditing={true}
+          onImageDeleted={async () => {
+            // Refresh card data to show updated image count
+            if (card.id) {
+              const updatedCard = await api.cardById(card.id)
+              setCard(updatedCard)
+            }
+          }}
+        />
       </div>
 
       <div>

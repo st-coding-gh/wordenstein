@@ -198,6 +198,10 @@ class Api {
       body: formData,
     })
   }
+
+  async cardDeleteImage(cardId: string, imageId: string) {
+    return await this.fetch('card/delete-image', { cardId, imageId })
+  }
 }
 
 export const api = new Api()

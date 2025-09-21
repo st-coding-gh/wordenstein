@@ -3,7 +3,10 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeSanitize from 'rehype-sanitize'
 import Image from 'next/image'
-import { Carousel } from 'antd'
+import { Carousel, Button, message } from 'antd'
+import { DeleteOutlined } from '@ant-design/icons'
+import { api } from '@/services/api'
+import { useState } from 'react'
 
 export function Card({ card }: { card: TCard }) {
   return (
@@ -43,7 +46,18 @@ export function CardWord({ card }: { card: TCard }) {
   )
 }
 
-export function CardImage({ card }: { card: TCard }) {
+export function CardImage({
+  card,
+  isEditing = false,
+  onImageDeleted
+}: {
+  card: TCard
+  isEditing?: boolean
+  onImageDeleted?: () => void
+}) {
+  const [messageApi, contextHolder] = message.useMessage()
+  const [deletingImageId, setDeletingImageId] = useState<string | null>(null)
+
   if (!card.id) return null
 
   // Get image IDs from card.image array, with fallback to legacy system
@@ -55,22 +69,73 @@ export function CardImage({ card }: { card: TCard }) {
     return [card.id!]
   }
 
+  const handleDeleteImage = async (imageId: string) => {
+    if (!card.id) return
+
+    setDeletingImageId(imageId)
+    try {
+      const response = await api.cardDeleteImage(card.id, imageId)
+
+      if (response.success) {
+        messageApi.open({
+          type: 'success',
+          content: `Image deleted. ${response.remainingImages} images remaining.`
+        })
+        onImageDeleted?.()
+      } else {
+        messageApi.open({
+          type: 'error',
+          content: response.message || 'Failed to delete image'
+        })
+      }
+    } catch (error) {
+      messageApi.open({
+        type: 'error',
+        content: 'Error deleting image'
+      })
+    }
+    setDeletingImageId(null)
+  }
+
+  const renderImageWithDelete = (imageId: string, index: number, className = "") => (
+    <div key={imageId} className={`${className}`}>
+      <img
+        src={`/api/image/${imageId}`}
+        alt={`${card.imagePrompt} - Image ${index + 1}`}
+        className="w-full h-auto object-cover rounded"
+        onError={(e) => {
+          const target = e.target as HTMLImageElement
+          if (imageId === card.id) {
+            target.src = `/api/card/image/${card.id}`
+          }
+        }}
+      />
+      {isEditing && (
+        <div className="flex justify-center mt-2">
+          <Button
+            type="primary"
+            danger
+            size="small"
+            icon={<DeleteOutlined />}
+            loading={deletingImageId === imageId}
+            onClick={() => handleDeleteImage(imageId)}
+            title="Delete this image"
+          >
+            Delete
+          </Button>
+        </div>
+      )}
+    </div>
+  )
+
   const imageIds = getImageIds()
 
   if (imageIds.length === 1) {
     // Single image - display normally
     return (
       <div className="w-full max-w-[500px] rounded-lg overflow-hidden">
-        <img
-          src={`/api/image/${imageIds[0]}`}
-          alt={card.imagePrompt}
-          className="w-full"
-          onError={(e) => {
-            // Fallback to legacy API if direct image API fails
-            const target = e.target as HTMLImageElement
-            target.src = `/api/card/image/${card.id}`
-          }}
-        />
+        {contextHolder}
+        {renderImageWithDelete(imageIds[0], 0)}
       </div>
     )
   }
@@ -78,6 +143,7 @@ export function CardImage({ card }: { card: TCard }) {
   // Multiple images - display with carousel
   return (
     <div className="w-full max-w-[1000px] rounded-lg overflow-hidden">
+      {contextHolder}
       <Carousel
         dots={true}
         arrows={true}
@@ -95,22 +161,9 @@ export function CardImage({ card }: { card: TCard }) {
         ]}
         className="card-image-carousel"
       >
-        {imageIds.map((imageId, index) => (
-          <div key={imageId} className="px-1">
-            <img
-              src={`/api/image/${imageId}`}
-              alt={`${card.imagePrompt} - Image ${index + 1}`}
-              className="w-full h-auto object-cover rounded"
-              onError={(e) => {
-                // Fallback for legacy images
-                const target = e.target as HTMLImageElement
-                if (imageId === card.id) {
-                  target.src = `/api/card/image/${card.id}`
-                }
-              }}
-            />
-          </div>
-        ))}
+        {imageIds.map((imageId, index) =>
+          renderImageWithDelete(imageId, index, "px-1")
+        )}
       </Carousel>
 
       {/* Image counter */}
@@ -120,6 +173,11 @@ export function CardImage({ card }: { card: TCard }) {
           <span className="ml-1 text-xs">
             (showing {Math.min(2, imageIds.length)} at once on large screens)
           </span>
+        )}
+        {isEditing && (
+          <div className="text-xs text-orange-600 mt-1">
+            🗑️ Click delete buttons on images to remove them
+          </div>
         )}
       </div>
     </div>
