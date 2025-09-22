@@ -20,8 +20,9 @@ async function handler(query: TTrainingSettingReq) {
   let cards: TCard[] = []
 
   const level = {
-    beginner: 1,
-    intermediate: [2, 3, 4],
+    learning: 0,
+    beginner: [1, 2],
+    intermediate: [3, 4],
     advanced: 5,
   }
 
@@ -39,24 +40,42 @@ async function handler(query: TTrainingSettingReq) {
   )[0]
 
   switch (query.trainingType) {
+    case 'learning-from-image-english':
+      cards = await prisma.card.findMany({
+        where: { correctAnswers: { lte: level.learning } },
+        orderBy: { correctAnswers: 'asc' },
+      })
+      break
+
     case 'beginner-from-english':
       cards = await prisma.card.findMany({
-        // where correctAnswers equal or below 0
-        where: { correctAnswers: { lte: level.beginner } },
+        where: { correctAnswers: { in: level.beginner } },
         orderBy: { correctAnswers: 'asc' },
       })
       break
 
     case 'beginner-from-image-russian':
       cards = await prisma.card.findMany({
-        // where correctAnswers equal or below 0
-        where: { correctAnswers: { lte: level.beginner } },
+        where: { correctAnswers: { in: level.beginner } },
+        orderBy: { correctAnswers: 'asc' },
+      })
+      break
+
+    case 'beginner-from-image-only':
+      cards = await prisma.card.findMany({
+        where: { correctAnswers: { in: level.beginner } },
         orderBy: { correctAnswers: 'asc' },
       })
       break
 
     case 'intermediate-from-image-russian':
-      // where correctAnswers is 1,2 or 3
+      cards = await prisma.card.findMany({
+        where: { correctAnswers: { in: level.intermediate } },
+        orderBy: { correctAnswers: 'asc' },
+      })
+      break
+
+    case 'intermediate-from-definition':
       cards = await prisma.card.findMany({
         where: { correctAnswers: { in: level.intermediate } },
         orderBy: { correctAnswers: 'asc' },
@@ -64,7 +83,6 @@ async function handler(query: TTrainingSettingReq) {
       break
 
     case 'advanced-from-russian':
-      // where correctAnswers is greater or equal to 4
       cards = await prisma.card.findMany({
         where: { correctAnswers: firstAdvancedCorrectScore },
         orderBy: { correctAnswers: 'asc' },
@@ -72,7 +90,6 @@ async function handler(query: TTrainingSettingReq) {
       break
 
     case 'advanced-from-definition':
-      // where correctAnswers is greater or equal to 4
       cards = await prisma.card.findMany({
         where: { correctAnswers: firstAdvancedCorrectScore },
         orderBy: { correctAnswers: 'asc' },
@@ -80,7 +97,6 @@ async function handler(query: TTrainingSettingReq) {
       break
 
     case 'advanced-from-english':
-      // where correctAnswers is greater or equal to 4
       cards = await prisma.card.findMany({
         where: { correctAnswers: firstAdvancedCorrectScore },
         orderBy: { correctAnswers: 'asc' },

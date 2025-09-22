@@ -18,7 +18,7 @@ import { StatsComponent } from '@/components/parts/stats'
 export default function Train() {
   const [settingLimit, setSettingLimit] = useState<number | null>(null)
   const [settingTrainingType, setSettingTrainingType] = useState<TTrainingType>(
-    'beginner-from-english'
+    'learning-from-image-english'
   )
   const [isSettingsDone, setIsSettingsDone] = useState(false)
   const [cardsSetIsLoading, setCardsSetIsLoading] = useState(false)
@@ -51,13 +51,16 @@ export default function Train() {
                 gap: 8,
               }}
             >
+              <Radio value="learning-from-image-english">learning, image and english</Radio>
               <Radio value="beginner-from-english">beginner, english</Radio>
               <Radio value="beginner-from-image-russian">
                 beginner, russian and image
               </Radio>
+              <Radio value="beginner-from-image-only">beginner, image only</Radio>
               <Radio value="intermediate-from-image-russian">
                 intermediate, russian and image
               </Radio>
+              <Radio value="intermediate-from-definition">intermediate, definition</Radio>
               <Radio value="advanced-from-russian">advanced, russian</Radio>
               <Radio value="advanced-from-definition">
                 advanced, definition
@@ -219,14 +222,23 @@ function TrainingQuestion({
   settingQuestionsType: TTrainingType
 }) {
   switch (settingQuestionsType) {
+    case 'learning-from-image-english':
+      return <QuestionLearningImageEnglish card={card} />
+
     case 'beginner-from-english':
       return <QuestionBeginnerEnglish card={card} />
 
     case 'beginner-from-image-russian':
       return <QuestionImageRussian card={card} />
 
+    case 'beginner-from-image-only':
+      return <QuestionImageOnly card={card} />
+
     case 'intermediate-from-image-russian':
       return <QuestionImageRussian card={card} />
+
+    case 'intermediate-from-definition':
+      return <QuestionDefinition card={card} />
 
     case 'advanced-from-russian':
       return <QuestionRussian card={card} />
@@ -266,4 +278,17 @@ function QuestionDefinition({ card }: { card: TCard }) {
 
 function QuestionEnglish({ card }: { card: TCard }) {
   return <CardWord card={card} />
+}
+
+function QuestionLearningImageEnglish({ card }: { card: TCard }) {
+  return (
+    <>
+      <CardImage card={card} />
+      <CardWord card={card} />
+    </>
+  )
+}
+
+function QuestionImageOnly({ card }: { card: TCard }) {
+  return <CardImage card={card} />
 }
