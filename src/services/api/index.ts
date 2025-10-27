@@ -202,6 +202,10 @@ class Api {
   async cardDeleteImage(cardId: string, imageId: string) {
     return await this.fetch('card/delete-image', { cardId, imageId })
   }
+
+  async cardSearch(searchTerm: string) {
+    return (await this.fetch('card/search', { searchTerm })) as string[]
+  }
 }
 
 export const api = new Api()
