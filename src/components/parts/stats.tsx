@@ -5,27 +5,16 @@ import { TStatsRes, TGenerateUnknownLogs } from '@/types/api.types'
 import { TStatsDisplay } from '@/types/stats.types'
 import { Skeleton, Table } from 'antd'
 import { useEffect, useState } from 'react'
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js'
-import { Line } from 'react-chartjs-2'
+import dynamic from 'next/dynamic'
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
+// Dynamically import Chart.js components with SSR disabled
+const Line = dynamic(
+  () => import('react-chartjs-2').then((mod) => mod.Line),
+  { ssr: false }
 )
+
+// Chart.js registration will happen in the GenerationChart component
+let chartJsRegistered = false
 
 export function StatsComponent({ display = {
   'total_cards': true,
@@ -169,12 +158,45 @@ function StatsHeading({ children }: { children: React.ReactNode }) {
 }
 
 function GenerationChart({ logs }: { logs: TGenerateUnknownLogs }) {
-  // Filter logs that have actual generated cards
-  const validLogs = logs.filter(log => log.generatedCards > 0)
-  
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    // Register Chart.js components only once on the client side
+    if (!chartJsRegistered && typeof window !== 'undefined') {
+      import('chart.js').then((ChartJS) => {
+        ChartJS.Chart.register(
+          ChartJS.CategoryScale,
+          ChartJS.LinearScale,
+          ChartJS.PointElement,
+          ChartJS.LineElement,
+          ChartJS.Title,
+          ChartJS.Tooltip,
+          ChartJS.Legend
+        )
+        chartJsRegistered = true
+        setIsClient(true)
+      })
+    } else if (chartJsRegistered) {
+      setIsClient(true)
+    }
+  }, [])
+
+  // Filter logs that have actual generated cards and valid data
+  const validLogs = logs.filter(log =>
+    log &&
+    typeof log.generatedCards === 'number' &&
+    log.generatedCards > 0 &&
+    !isNaN(log.generatedCards) &&
+    isFinite(log.generatedCards)
+  )
+
   // Sort by date
   validLogs.sort((a, b) => new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime())
-  
+
+  if (!isClient) {
+    return <p className="text-gray-500">Loading chart...</p>
+  }
+
   if (validLogs.length === 0) {
     return <p className="text-gray-500">No generation data available</p>
   }
@@ -183,19 +205,29 @@ function GenerationChart({ logs }: { logs: TGenerateUnknownLogs }) {
   const calculateTrendLine = (data: number[]) => {
     const n = data.length
     if (n < 2) return data
-    
+
     const xValues = Array.from({ length: n }, (_, i) => i)
     const yValues = data
-    
+
     const sumX = xValues.reduce((sum, x) => sum + x, 0)
     const sumY = yValues.reduce((sum, y) => sum + y, 0)
     const sumXY = xValues.reduce((sum, x, i) => sum + x * yValues[i], 0)
     const sumXX = xValues.reduce((sum, x) => sum + x * x, 0)
-    
-    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX)
+
+    const denominator = (n * sumXX - sumX * sumX)
+    // Avoid division by zero
+    if (denominator === 0) return data
+
+    const slope = (n * sumXY - sumX * sumY) / denominator
     const intercept = (sumY - slope * sumX) / n
-    
-    return xValues.map(x => slope * x + intercept)
+
+    // Validate slope and intercept
+    if (!isFinite(slope) || !isFinite(intercept)) return data
+
+    return xValues.map(x => {
+      const value = slope * x + intercept
+      return isFinite(value) ? value : 0
+    })
   }
 
   const generatedCardsData = validLogs.map(log => log.generatedCards)
@@ -216,9 +248,10 @@ function GenerationChart({ logs }: { logs: TGenerateUnknownLogs }) {
         data: generatedCardsData,
         borderColor: 'rgb(59, 130, 246)',
         backgroundColor: 'rgba(59, 130, 246, 0.1)',
-        tension: 0.1,
+        tension: 0, // Use straight lines instead of curves to avoid control point issues
         pointRadius: 4,
         pointHoverRadius: 6,
+        cubicInterpolationMode: 'default' as const,
       },
       {
         label: 'Trend',
@@ -230,6 +263,7 @@ function GenerationChart({ logs }: { logs: TGenerateUnknownLogs }) {
         pointRadius: 0,
         pointHoverRadius: 0,
         tension: 0,
+        cubicInterpolationMode: 'default' as const,
       },
     ],
   }
