@@ -17,96 +17,24 @@ export async function POST(req: Request) {
 }
 
 async function handler(query: TTrainingSettingReq) {
-  let cards: TCard[] = []
-
-  const level = {
-    learning: 0,
-    beginner: [1, 2],
-    intermediate: [3, 4],
-    advanced: 5,
+  const correctAnswersFilter: { gte?: number; lte?: number } = {}
+  if (query.minLevel !== undefined) {
+    correctAnswersFilter.gte = query.minLevel
+  }
+  if (query.maxLevel !== undefined) {
+    correctAnswersFilter.lte = query.maxLevel
   }
 
-  // get all unique values in correctAnswers column
-  const correctAnswersUniqueValues = (
-    await prisma.card.findMany({
-      select: { correctAnswers: true },
-      distinct: ['correctAnswers'],
-      orderBy: { correctAnswers: 'asc' },
-    })
-  ).map(card => card.correctAnswers)
-
-  const firstAdvancedCorrectScore = correctAnswersUniqueValues.filter(
-    answer => answer >= level.advanced
-  )[0]
-
-  switch (query.trainingType) {
-    case 'learning-from-image-english':
-      cards = await prisma.card.findMany({
-        where: { correctAnswers: { lte: level.learning } },
-        orderBy: { correctAnswers: 'asc' },
-      })
-      break
-
-    case 'beginner-from-english':
-      cards = await prisma.card.findMany({
-        where: { correctAnswers: { in: level.beginner } },
-        orderBy: { correctAnswers: 'asc' },
-      })
-      break
-
-    case 'beginner-from-image-russian':
-      cards = await prisma.card.findMany({
-        where: { correctAnswers: { in: level.beginner } },
-        orderBy: { correctAnswers: 'asc' },
-      })
-      break
-
-    case 'beginner-from-image-only':
-      cards = await prisma.card.findMany({
-        where: { correctAnswers: { in: level.beginner } },
-        orderBy: { correctAnswers: 'asc' },
-      })
-      break
-
-    case 'intermediate-from-image-russian':
-      cards = await prisma.card.findMany({
-        where: { correctAnswers: { in: level.intermediate } },
-        orderBy: { correctAnswers: 'asc' },
-      })
-      break
-
-    case 'intermediate-from-definition':
-      cards = await prisma.card.findMany({
-        where: { correctAnswers: { in: level.intermediate } },
-        orderBy: { correctAnswers: 'asc' },
-      })
-      break
-
-    case 'advanced-from-russian':
-      cards = await prisma.card.findMany({
-        where: { correctAnswers: firstAdvancedCorrectScore },
-        orderBy: { correctAnswers: 'asc' },
-      })
-      break
-
-    case 'advanced-from-definition':
-      cards = await prisma.card.findMany({
-        where: { correctAnswers: firstAdvancedCorrectScore },
-        orderBy: { correctAnswers: 'asc' },
-      })
-      break
-
-    case 'advanced-from-english':
-      cards = await prisma.card.findMany({
-        where: { correctAnswers: firstAdvancedCorrectScore },
-        orderBy: { correctAnswers: 'asc' },
-      })
-      break
-  }
+  const cards: TCard[] = await prisma.card.findMany({
+    where:
+      correctAnswersFilter.gte !== undefined ||
+      correctAnswersFilter.lte !== undefined
+        ? { correctAnswers: correctAnswersFilter }
+        : undefined,
+    orderBy: { correctAnswers: 'asc' },
+  })
 
   const shuffled = cards.sort(() => Math.random() - 0.5)
 
-  if (query.limit && shuffled.length < query.limit) return shuffled
-  if (query.limit) return shuffled.slice(0, query.limit)
   return shuffled
 }

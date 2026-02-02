@@ -1,10 +1,9 @@
 'use client'
 
 import { api } from '@/services/api'
-import { TTrainingSettingReq } from '@/types/api.types'
 import { TCard } from '@/types/card'
-import { TTrainingType } from '@/types/training'
-import { Button, Input, InputNumber, Radio } from 'antd'
+import { TTrainingQuestionType } from '@/types/training'
+import { Button, InputNumber, Radio } from 'antd'
 import React, { useEffect, useState } from 'react'
 import {
   Card,
@@ -16,10 +15,11 @@ import {
 import { StatsComponent } from '@/components/parts/stats'
 
 export default function Train() {
-  const [settingLimit, setSettingLimit] = useState<number | null>(null)
-  const [settingTrainingType, setSettingTrainingType] = useState<TTrainingType>(
-    'learning-from-image-english'
-  )
+  const [settingQuestionType, setSettingQuestionType] =
+    useState<TTrainingQuestionType>('english')
+  const [minLevel, setMinLevel] = useState<number | null>(null)
+  const [maxLevel, setMaxLevel] = useState<number | null>(null)
+  const [isLevelRangeInvalid, setIsLevelRangeInvalid] = useState(false)
   const [isSettingsDone, setIsSettingsDone] = useState(false)
   const [cardsSetIsLoading, setCardsSetIsLoading] = useState(false)
   const [cards, setCards] = useState<TCard[]>()
@@ -33,61 +33,75 @@ export default function Train() {
       setIsTrainingDone(true)
       setCurrentCardIndex(0)
     }
-  }, [currentCardIndex])
+  }, [currentCardIndex, isSettingsDone, cards?.length])
+
+  useEffect(() => {
+    if (minLevel === null || maxLevel === null) {
+      setIsLevelRangeInvalid(false)
+      return
+    }
+    setIsLevelRangeInvalid(minLevel > maxLevel)
+  }, [minLevel, maxLevel])
 
   return (
     <>
       {!isSettingsDone && (
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-3">
-            <SettingsLabel text="training type" />
+            <SettingsLabel text="question type" />
 
             <Radio.Group
-              onChange={e => setSettingTrainingType(e.target.value)}
-              value={settingTrainingType}
+              onChange={e => setSettingQuestionType(e.target.value)}
+              value={settingQuestionType}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 8,
               }}
             >
-              <Radio value="learning-from-image-english">learning, image and english</Radio>
-              <Radio value="beginner-from-english">beginner, english</Radio>
-              <Radio value="beginner-from-image-russian">
-                beginner, russian and image
-              </Radio>
-              <Radio value="beginner-from-image-only">beginner, image only</Radio>
-              <Radio value="intermediate-from-image-russian">
-                intermediate, russian and image
-              </Radio>
-              <Radio value="intermediate-from-definition">intermediate, definition</Radio>
-              <Radio value="advanced-from-russian">advanced, russian</Radio>
-              <Radio value="advanced-from-definition">
-                advanced, definition
-              </Radio>
-              <Radio value='advanced-from-english'>advanced, english</Radio>
+              <Radio value="english">english</Radio>
+              <Radio value="russian">russian</Radio>
+              <Radio value="image">image</Radio>
+              <Radio value="definition">definition</Radio>
             </Radio.Group>
           </div>
 
           <div className="flex flex-col gap-3">
-            <SettingsLabel text="limit number of cards" />
-
-            <InputNumber
-              value={settingLimit}
-              onChange={e => setSettingLimit(e as number)}
-              size="large"
-            />
+            <SettingsLabel text="levels range (inclusive)" />
+            <div className="flex flex-row gap-2">
+              <InputNumber
+                value={minLevel}
+                onChange={e => setMinLevel(e as number)}
+                size="large"
+                placeholder="min"
+                className="w-full"
+              />
+              <InputNumber
+                value={maxLevel}
+                onChange={e => setMaxLevel(e as number)}
+                size="large"
+                placeholder="max"
+                className="w-full"
+              />
+            </div>
+            {isLevelRangeInvalid && (
+              <p className="text-app-danger font-bold">
+                Min level must be less than or equal to max level.
+              </p>
+            )}
           </div>
 
           <Button
             type="primary"
             size="large"
             loading={cardsSetIsLoading}
+            disabled={isLevelRangeInvalid}
             onClick={async () => {
               setCardsSetIsLoading(true)
               const res = await api.trainingSet({
-                trainingType: settingTrainingType,
-                limit: settingLimit ? settingLimit : undefined,
+                questionType: settingQuestionType,
+                minLevel: minLevel === null ? undefined : minLevel,
+                maxLevel: maxLevel === null ? undefined : maxLevel,
               })
 
               setCards(res)
@@ -116,7 +130,7 @@ export default function Train() {
           <TrainingCard
             card={cards?.[currentCardIndex]}
             currentCardIndex={currentCardIndex}
-            settingQuestionsType={settingTrainingType}
+            settingQuestionsType={settingQuestionType}
             setCurrentCardIndex={setCurrentCardIndex}
           />
         </div>
@@ -152,7 +166,7 @@ function TrainingCard({
 }: {
   card?: TCard
   currentCardIndex: number
-  settingQuestionsType: TTrainingType
+  settingQuestionsType: TTrainingQuestionType
   setCurrentCardIndex: React.Dispatch<React.SetStateAction<number>>
 }) {
   const [isQuestion, setIsQuestion] = useState(true)
@@ -219,49 +233,21 @@ function TrainingQuestion({
   settingQuestionsType,
 }: {
   card: TCard
-  settingQuestionsType: TTrainingType
+  settingQuestionsType: TTrainingQuestionType
 }) {
   switch (settingQuestionsType) {
-    case 'learning-from-image-english':
-      return <QuestionLearningImageEnglish card={card} />
+    case 'english':
+      return <QuestionEnglish card={card} />
 
-    case 'beginner-from-english':
-      return <QuestionBeginnerEnglish card={card} />
-
-    case 'beginner-from-image-russian':
-      return <QuestionImageRussian card={card} />
-
-    case 'beginner-from-image-only':
-      return <QuestionImageOnly card={card} />
-
-    case 'intermediate-from-image-russian':
-      return <QuestionImageRussian card={card} />
-
-    case 'intermediate-from-definition':
-      return <QuestionDefinition card={card} />
-
-    case 'advanced-from-russian':
+    case 'russian':
       return <QuestionRussian card={card} />
 
-    case 'advanced-from-definition':
+    case 'image':
+      return <QuestionImageOnly card={card} />
+
+    case 'definition':
       return <QuestionDefinition card={card} />
-
-    case 'advanced-from-english':
-      return <QuestionEnglish card={card} />
   }
-}
-
-function QuestionBeginnerEnglish({ card }: { card: TCard }) {
-  return <CardWord card={card} />
-}
-
-function QuestionImageRussian({ card }: { card: TCard }) {
-  return (
-    <>
-      <CardImage card={card} />
-      <CardTranslation card={card} />
-    </>
-  )
 }
 
 function QuestionRussian({ card }: { card: TCard }) {
@@ -278,15 +264,6 @@ function QuestionDefinition({ card }: { card: TCard }) {
 
 function QuestionEnglish({ card }: { card: TCard }) {
   return <CardWord card={card} />
-}
-
-function QuestionLearningImageEnglish({ card }: { card: TCard }) {
-  return (
-    <>
-      <CardImage card={card} />
-      <CardWord card={card} />
-    </>
-  )
 }
 
 function QuestionImageOnly({ card }: { card: TCard }) {

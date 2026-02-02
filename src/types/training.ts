@@ -1,10 +1,5 @@
-export type TTrainingType =
-  | 'learning-from-image-english'
-  | 'beginner-from-english'
-  | 'beginner-from-image-russian'
-  | 'beginner-from-image-only'
-  | 'intermediate-from-image-russian'
-  | 'intermediate-from-definition'
-  | 'advanced-from-russian'
-  | 'advanced-from-definition'
-  | 'advanced-from-english'
+export type TTrainingQuestionType =
+  | 'english'
+  | 'russian'
+  | 'image'
+  | 'definition'

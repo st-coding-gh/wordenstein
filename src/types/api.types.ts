@@ -1,5 +1,5 @@
 import { TCard } from './card'
-import { TTrainingType } from './training'
+import { TTrainingQuestionType } from './training'
 
 export type TAuthStatusRes = {
   isAuthenticated: boolean
@@ -25,8 +25,9 @@ export type TCardAllRes = {
 export type TCardByIdReq = { id: string }
 
 export type TTrainingSettingReq = {
-  trainingType: TTrainingType
-  limit?: number
+  questionType: TTrainingQuestionType
+  minLevel?: number
+  maxLevel?: number
 }
 
 export type TAnswerResultReq = {
