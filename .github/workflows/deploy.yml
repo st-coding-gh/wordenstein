@@ -13,32 +13,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Install Dependencies
-        run: npm install
-
-      # - name: Create Environment File
-      #   run: |
-      #     if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-      #       echo "${{ secrets.ENV_PRODUCTION }}" > .env.production
-      #     else
-      #       echo "${{ secrets.ENV_DEVELOPMENT }}" > .env.production
-      #     fi
-      #
-
-      - name: Create upload directory
-        run: mkdir -p ./uploads/images/cards
-
       - name: Create Environment File
         run: echo "${{ secrets.ENV }}" > .env
-
-      - name: Build Project
-        run: npm run build
-
-      - name: Remove Unnecessary Files
-        run: rm -R .git .github .gitignore package-lock.json tsconfig.json src
-
-      - name: List Files (Debugging)
-        run: ls -la
 
       - name: Make a Directory for SSH
         run: mkdir -p "$HOME/.ssh"
@@ -49,34 +25,35 @@ jobs:
       - name: Set SSH Key Permissions
         run: chmod 600 "$HOME/.ssh/key"
 
-      # - name: Set Deployment Path
-      #   id: set_env
-      #   run: |
-      #     if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-      #       echo "DEPLOY_PATH=${{ secrets.PATH }}" >> $GITHUB_ENV
-      #     elif [ "${{ github.ref }}" == "refs/heads/dev" ]; then
-      #       echo "DEPLOY_PATH=${{ secrets.DEVPATH }}" >> $GITHUB_ENV
-      #     fi
-
       - name: Upload to Server
-        run: rsync -e "ssh -p 2244 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete --exclude=database/migrations --exclude=database/prod.db --exclude=uploads . ${{ secrets.USER }}@${{ secrets.IP }}:${{ secrets.PATH }}
-
-      - name: Start Next.js Server with PM2
         run: |
-          # if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-          #   PROCESS_NAME="main"
-          #   START_SCRIPT="start-main"
-          # else
-          #   PROCESS_NAME="dev"
-          #   START_SCRIPT="start-dev"
-          # fi
+          rsync -e "ssh -p 2244 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" \
+            --archive \
+            --compress \
+            --delete \
+            --exclude=.git \
+            --exclude=.github \
+            --exclude=node_modules \
+            --exclude=.next \
+            --exclude=database/prod.db \
+            --exclude=uploads \
+            . ${{ secrets.USER }}@${{ secrets.IP }}:${{ secrets.PATH }}
 
-          PROCESS_NAME="wordenstein"
-
+      - name: Deploy with Docker Compose
+        run: |
           ssh -p 2244 -i "$HOME/.ssh/key" -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.IP }} << EOF
+            set -e
             cd ${{ secrets.PATH }}
-            pm2 stop $PROCESS_NAME || true
-            pm2 delete $PROCESS_NAME || true
-            npx prisma migrate deploy
-            pm2 start npm --name="$PROCESS_NAME" -- run start
+            command -v docker >/dev/null || { echo "Docker is not installed on the VPS"; exit 1; }
+            docker compose version >/dev/null || { echo "Docker Compose plugin is not installed on the VPS"; exit 1; }
+            mkdir -p database uploads/images/cards
+            pm2 stop wordenstein || true
+            pm2 delete wordenstein || true
+            pkill -f "[u]vicorn main:app" || true
+            COMPOSE_PARALLEL_LIMIT=1 docker compose build lemma
+            COMPOSE_PARALLEL_LIMIT=1 docker compose build wordenstein
+            docker compose run --rm wordenstein npx prisma migrate deploy --schema=./database/schema.prisma
+            docker compose up -d
+            docker compose ps
+            docker builder prune -f
           EOF

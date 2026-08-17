@@ -8,6 +8,7 @@ export default function Vocabular() {
   const [loading, setLoading] = useState(false)
   const [input, setInput] = useState('')
   const [output, setOutput] = useState<string[] | null>()
+  const [error, setError] = useState<string | null>(null)
 
   return (
     <div className="flex flex-col gap-5">
@@ -23,16 +24,33 @@ export default function Vocabular() {
         className="w-fit"
         onClick={async () => {
           setLoading(true)
-          const res = await api.findUnknownFromInput({
-            text: input,
-          })
+          setError(null)
 
-          setOutput(res)
-          setLoading(false)
+          try {
+            const res: unknown = await api.findUnknownFromInput({
+              text: input,
+            })
+
+            if (!Array.isArray(res)) {
+              const message = getErrorMessage(res)
+
+              throw new Error(message)
+            }
+
+            setOutput(res)
+          } catch (e) {
+            const error = e as Error
+            setOutput(null)
+            setError(error.message)
+          } finally {
+            setLoading(false)
+          }
         }}
       >
         extract
       </Button>
+
+      {error && <p className="text-sm text-app-danger-700">{error}</p>}
 
       {output && (
         <>
@@ -54,4 +72,17 @@ export default function Vocabular() {
       )}
     </div>
   )
+}
+
+function getErrorMessage(res: unknown) {
+  if (
+    typeof res === 'object' &&
+    res !== null &&
+    'message' in res &&
+    typeof res.message === 'string'
+  ) {
+    return res.message
+  }
+
+  return 'Unexpected API response'
 }

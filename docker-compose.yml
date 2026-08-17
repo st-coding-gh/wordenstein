@@ -1,0 +1,34 @@
+services:
+  wordenstein:
+    build:
+      context: .
+      network: host
+    env_file:
+      - .env
+    environment:
+      LEMMA_API_URL: http://lemma:8000
+    user: "1000:1000"
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./database:/app/database
+      - ./uploads:/app/uploads
+    depends_on:
+      - lemma
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    restart: unless-stopped
+
+  lemma:
+    build:
+      context: ./services/lemma
+      network: host
+    environment:
+      API_KEY: ${LEMMA_API_KEY}
+    expose:
+      - "8000"
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    restart: unless-stopped

@@ -1,12 +1,12 @@
-import { TVocabularUnknownReq } from '@/types/api.types'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/services/prisma'
 import dotenv from 'dotenv'
+import { lemmatize } from '@/services/lemma'
 
 dotenv.config()
 
 export async function POST(req: NextRequest) {
-  const body = await req.json()
+  await req.json()
 
   try {
     const res = await handler()
@@ -59,25 +59,4 @@ async function handler() {
     recordLemmas: recordLemmas,
     updateSettings: updateSettings,
   }
-}
-
-async function lemmatize(query: TVocabularUnknownReq) {
-  const apiKey = process.env.LEMMA_API_KEY
-  const authorization = `Bearer ${apiKey}`
-
-  const apiReq = await fetch('https://lemma.st-coding.com/filter-lemmas', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: authorization,
-    },
-    body: JSON.stringify(query),
-  })
-
-  if (!apiReq.ok) {
-    throw new Error('API request failed')
-  }
-
-  const res = (await apiReq.json()) as { 'filtered-lemmas': string[] }
-  return res['filtered-lemmas']
 }

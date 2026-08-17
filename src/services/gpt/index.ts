@@ -8,10 +8,24 @@ import { wordCardPrompt } from './word-card-prompt'
 dotenv.config()
 
 class GPT {
-  private vseGpt = new OpenAI({
-    baseURL: 'https://api.vsegpt.ru/v1',
-    apiKey: process.env['VSEGPT_API_KEY'],
-  })
+  private client?: OpenAI
+
+  private get vseGpt() {
+    if (!this.client) {
+      const apiKey = process.env['VSEGPT_API_KEY']
+
+      if (!apiKey) {
+        throw new Error('VSEGPT_API_KEY is not configured')
+      }
+
+      this.client = new OpenAI({
+        baseURL: 'https://api.vsegpt.ru/v1',
+        apiKey,
+      })
+    }
+
+    return this.client
+  }
 
   async textToText(query: TGptTextToText) {
     const req = await this.vseGpt.chat.completions.create({
