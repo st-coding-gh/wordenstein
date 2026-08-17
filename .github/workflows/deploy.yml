@@ -52,7 +52,11 @@ jobs:
             pkill -f "[u]vicorn main:app" || true
             COMPOSE_PARALLEL_LIMIT=1 docker compose build lemma
             COMPOSE_PARALLEL_LIMIT=1 docker compose build wordenstein
-            docker compose run --rm wordenstein npx prisma migrate deploy --schema=./database/schema.prisma
+            if find database/migrations -mindepth 1 -maxdepth 1 -type d 2>/dev/null | grep -q .; then
+              docker compose run --rm wordenstein npx prisma migrate deploy --schema=./database/schema.prisma
+            else
+              echo "No Prisma migrations found; skipping migrate deploy."
+            fi
             docker compose up -d
             docker compose ps
             docker builder prune -f
