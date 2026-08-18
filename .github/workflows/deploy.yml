@@ -5,6 +5,10 @@ on:
     branches: [main, dev]
   workflow_dispatch:
 
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -43,6 +47,8 @@ jobs:
         run: |
           ssh -p 2244 -i "$HOME/.ssh/key" -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.IP }} << EOF
             set -e
+            exec 9>/tmp/wordenstein-deploy.lock
+            flock -w 900 9 || { echo "Another Wordenstein deploy is already running"; exit 1; }
             cd ${{ secrets.PATH }}
             command -v docker >/dev/null || { echo "Docker is not installed on the VPS"; exit 1; }
             docker compose version >/dev/null || { echo "Docker Compose plugin is not installed on the VPS"; exit 1; }
