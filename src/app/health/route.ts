@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, message: 'not found' }, { status: 404 })
   }
 
-  const type = req.nextUrl.searchParams.get('type')
+  const type = req.nextUrl.searchParams.get('type') ?? WEBSITE_HEARTBEAT
 
   if (type !== WEBSITE_HEARTBEAT) {
     return NextResponse.json(
@@ -55,5 +55,10 @@ function normalizeHost(host: string | null) {
 }
 
 function isLoopbackHost(host: string) {
-  return host === 'localhost' || host === '127.0.0.1' || host === '::1'
+  return (
+    host === 'localhost' ||
+    host === '127.0.0.1' ||
+    host === '::1' ||
+    host === '::ffff:127.0.0.1'
+  )
 }
