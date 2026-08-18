@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const WEBSITE_HEARTBEAT = 'website_heartbeat'
+const AGENT_SITE_TOKEN = 'WbAzYALGxa60ChN0B6ZsuZ8zCVgce3G9Wwk48M-fSjY'
 
 export const dynamic = 'force-dynamic'
 
@@ -9,16 +9,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, message: 'not found' }, { status: 404 })
   }
 
-  const type = req.nextUrl.searchParams.get('type') ?? WEBSITE_HEARTBEAT
-
-  if (type !== WEBSITE_HEARTBEAT) {
-    return NextResponse.json(
-      { ok: false, message: 'unsupported health check type' },
-      { status: 400 },
-    )
+  if (req.headers.get('authorization') !== `Bearer ${AGENT_SITE_TOKEN}`) {
+    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
   }
 
-  return NextResponse.json({ ok: true, type: WEBSITE_HEARTBEAT })
+  return NextResponse.json({ ok: true })
 }
 
 function isLocalRequest(req: NextRequest) {
