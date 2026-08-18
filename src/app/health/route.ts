@@ -23,20 +23,8 @@ export async function GET(req: NextRequest) {
 
 function isLocalRequest(req: NextRequest) {
   const host = normalizeHost(req.headers.get('host'))
-  const forwardedFor = req.headers.get('x-forwarded-for')
 
-  if (!host || !isLoopbackHost(host)) {
-    return false
-  }
-
-  if (!forwardedFor) {
-    return true
-  }
-
-  return forwardedFor
-    .split(',')
-    .map(value => value.trim())
-    .every(isLoopbackHost)
+  return Boolean(host && isLoopbackHost(host))
 }
 
 function normalizeHost(host: string | null) {
