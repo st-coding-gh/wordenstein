@@ -30,6 +30,14 @@ The existing `.env` remains the single environment file for the product. It must
 
 Compose injects `LEMMA_API_URL=http://lemma:8000` for the app container and passes `LEMMA_API_KEY` to the lemma container as `API_KEY`.
 
+For local development with `npm run dev`, `.env` must also include:
+
+```bash
+LEMMA_API_URL=http://127.0.0.1:8000
+```
+
+The dev script starts the lemma container with `docker-compose.dev.yml`, exposing lemma only on local port `8000`, then starts `next dev` on the host.
+
 ## Deploy Flow
 
 The GitHub Actions workflow uploads this repository to the VPS, then runs:
