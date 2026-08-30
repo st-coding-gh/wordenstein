@@ -11,6 +11,8 @@ import {
   TRecordUnknownReq,
   TStatsRes,
   TTrainingSettingReq,
+  TVocabularInputExtractionLog,
+  TVocabularInputExtractionStartRes,
   TVocabularUnknownReq,
   TWord,
 } from '@/types/api.types'
@@ -101,7 +103,25 @@ class Api {
   }
 
   async findUnknownFromInput(query: TVocabularUnknownReq) {
-    return (await this.fetch('vocabular/unknown-from-input', query)) as string[]
+    return (await this.fetch(
+      'vocabular/unknown-from-input',
+      query
+    )) as TVocabularInputExtractionStartRes
+  }
+
+  async findUnknownFromInputFile(formData: FormData) {
+    const res = await fetch('/api/vocabular/unknown-from-input', {
+      method: 'POST',
+      body: formData,
+    })
+
+    return (await res.json()) as TVocabularInputExtractionStartRes
+  }
+
+  async getUnknownFromInputLogs() {
+    return (await this.fetch(
+      'vocabular/unknown-from-input-log'
+    )) as TVocabularInputExtractionLog[]
   }
 
   async isOxfordRecorded() {

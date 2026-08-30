@@ -45,7 +45,31 @@ export type TStatsRes = {
   imagesSize: number
 }
 
-export type TVocabularUnknownReq = { text: string }
+export type TVocabularUnknownReq = { text: string; sourceName?: string }
+
+export type TVocabularInputExtractionLog = {
+  id: number
+  dateTime: string
+  sourceName: string | null
+  isFinished: boolean
+  isSuccess: boolean | null
+  totalChunks: number
+  processedChunks: number
+  totalChars: number
+  processedChars: number
+  chunkSizeChars: number
+  totalLemmas: number
+  acceptedWords: number
+  rejectedWords: number
+  totalTimeMs: number | null
+  estimatedEndTimeMs: number | null
+  errorMessage: string | null
+}
+
+export type TVocabularInputExtractionStartRes = {
+  message: string
+  log: TVocabularInputExtractionLog
+}
 
 export type TWord = { id: string; word: string }
 

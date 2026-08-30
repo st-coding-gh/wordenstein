@@ -10,7 +10,8 @@
     "start": "next start -p 8080 -H 127.0.0.1",
     "start:docker": "next start -p 8080 -H 0.0.0.0",
     "lint": "next lint",
-    "draft-scripts": "bun ./_drafts/scripts"
+    "draft-scripts": "bun ./_drafts/scripts",
+    "vocabulary:enrich-base-forms": "node scripts/enrich-vocabulary-base-forms.mjs"
   },
   "prisma": {
     "schema": "./database/schema.prisma"

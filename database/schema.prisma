@@ -68,3 +68,22 @@ model CardsGenerationLog {
   estimatedEndTimeMs Int?
   errorMessage       String?
 }
+
+model VocabularInputExtractionLog {
+  id                 Int      @id @default(autoincrement())
+  dateTime           String
+  sourceName         String?
+  isFinished         Boolean  @default(false)
+  isSuccess          Boolean?
+  totalChunks        Int
+  processedChunks    Int      @default(0)
+  totalChars         Int
+  processedChars     Int      @default(0)
+  chunkSizeChars     Int
+  totalLemmas        Int      @default(0)
+  acceptedWords      Int      @default(0)
+  rejectedWords      Int      @default(0)
+  totalTimeMs        Int?
+  estimatedEndTimeMs Int?
+  errorMessage       String?
+}
