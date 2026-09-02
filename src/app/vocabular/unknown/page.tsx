@@ -2,7 +2,10 @@
 
 import { api } from "@/services/api"
 import { Button, Input, Skeleton } from "antd"
-import { CheckCircleFilled } from "@ant-design/icons"
+import {
+  CheckCircleFilled,
+  CloseCircleFilled,
+} from "@ant-design/icons"
 import React, { useEffect, useState } from "react"
 import { TGetPossiblyUnknownRes, TWord } from "@/types/api.types"
 
@@ -14,6 +17,9 @@ export default function Unknown() {
   const [total, setTotal] = useState(0)
   const [searchResults, setSearchResults] = useState<string[]>([])
   const [searching, setSearching] = useState(false)
+  const allDisplayedSelected =
+    unknown.length > 0 &&
+    unknown.every((word) => checkedValues.some((checked) => checked.id === word.id))
 
   useEffect(() => {
     api.getUnknown().then((res) => {
@@ -117,13 +123,32 @@ export default function Unknown() {
         </div>
 
         <div>
-          <p className="w-full py-3 text-xs font-black text-center">
-            {unknown.length} of {total}
-          </p>
+          <div className="flex items-center justify-center gap-2 py-3">
+            <p className="text-xs font-black">{unknown.length} of {total}</p>
+            <Button
+              type="text"
+              shape="circle"
+              size="small"
+              className="!h-5 !w-5 !border-0 !p-0 !text-app-primary"
+              disabled={unknown.length === 0}
+              aria-label={allDisplayedSelected ? "deselect all" : "select all"}
+              title={allDisplayedSelected ? "deselect all" : "select all"}
+              icon={
+                allDisplayedSelected ? <CloseCircleFilled /> : <CheckCircleFilled />
+              }
+              onClick={() => {
+                setCheckedValues(allDisplayedSelected ? [] : unknown)
+              }}
+            />
+          </div>
           <ul className="flex flex-row gap-2 flex-wrap">
             {unknown.map((word) => (
               <li key={word.id}>
-                <Word word={word} setCheckedValues={setCheckedValues} />
+                <Word
+                  word={word}
+                  checked={checkedValues.some((checked) => checked.id === word.id)}
+                  setCheckedValues={setCheckedValues}
+                />
               </li>
             ))}
           </ul>
@@ -135,13 +160,13 @@ export default function Unknown() {
 
 function Word({
   word,
+  checked,
   setCheckedValues,
 }: {
   word: TWord
+  checked: boolean
   setCheckedValues: React.Dispatch<React.SetStateAction<TGetPossiblyUnknownRes>>
 }) {
-  const [checked, setChecked] = useState(false)
-
   const color = checked ? "bg-app-danger" : "bg-app-info"
 
   return (
@@ -149,11 +174,9 @@ function Word({
       className={`px-6 py-3  rounded-full text-app-contrast text-sm font-bold ${color} active:translate-y-0.5`}
       onClick={() => {
         if (checked) {
-          setChecked(false)
-          setCheckedValues((prev) => prev.filter((w) => w.word !== word.word))
+          setCheckedValues((prev) => prev.filter((w) => w.id !== word.id))
           navigator.clipboard.writeText(word.word)
         } else {
-          setChecked(true)
           setCheckedValues((prev) => [...prev, word])
           navigator.clipboard.writeText(word.word)
         }

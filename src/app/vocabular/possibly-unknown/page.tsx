@@ -1,10 +1,9 @@
 'use client'
 
 import { api } from '@/services/api'
-import { Button, Checkbox, Skeleton } from 'antd'
+import { Button, Skeleton } from 'antd'
+import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons'
 import React, { useEffect, useState } from 'react'
-import type { CheckboxProps } from 'antd'
-import { genCheckboxStyle } from 'antd/es/checkbox/style'
 import { TGetPossiblyUnknownRes, TWord } from '@/types/api.types'
 
 export default function PossiblyUnknown() {
@@ -14,6 +13,11 @@ export default function PossiblyUnknown() {
   const [checkedValues, setCheckedValues] = useState<TGetPossiblyUnknownRes>([])
   const [total, setTotal] = useState(0)
   const limit = 100
+  const allDisplayedSelected =
+    possiblyUnknown.length > 0 &&
+    possiblyUnknown.every(word =>
+      checkedValues.some(checked => checked.id === word.id)
+    )
 
   useEffect(() => {
     api.getPossiblyUnknown().then(res => {
@@ -69,13 +73,34 @@ export default function PossiblyUnknown() {
         </div>
 
         <div>
-          <p className="w-full py-3 text-xs font-black text-center">
-            {possiblyUnknown.length} of {total}
-          </p>
+          <div className="flex items-center justify-center gap-2 py-3">
+            <p className="text-xs font-black">
+              {possiblyUnknown.length} of {total}
+            </p>
+            <Button
+              type="text"
+              shape="circle"
+              size="small"
+              className="!h-5 !w-5 !border-0 !p-0 !text-app-primary"
+              disabled={possiblyUnknown.length === 0}
+              aria-label={allDisplayedSelected ? 'deselect all' : 'select all'}
+              title={allDisplayedSelected ? 'deselect all' : 'select all'}
+              icon={
+                allDisplayedSelected ? <CloseCircleFilled /> : <CheckCircleFilled />
+              }
+              onClick={() => {
+                setCheckedValues(allDisplayedSelected ? [] : possiblyUnknown)
+              }}
+            />
+          </div>
           <ul className="flex flex-row gap-2 flex-wrap">
             {possiblyUnknown.map(word => (
               <li key={word.id}>
-                <Word word={word} setCheckedValues={setCheckedValues} />
+                <Word
+                  word={word}
+                  checked={checkedValues.some(checked => checked.id === word.id)}
+                  setCheckedValues={setCheckedValues}
+                />
               </li>
             ))}
           </ul>
@@ -87,13 +112,13 @@ export default function PossiblyUnknown() {
 
 function Word({
   word,
+  checked,
   setCheckedValues,
 }: {
   word: TWord
+  checked: boolean
   setCheckedValues: React.Dispatch<React.SetStateAction<TGetPossiblyUnknownRes>>
 }) {
-  const [checked, setChecked] = useState(false)
-
   const color = checked ? 'bg-app-danger' : 'bg-app-info'
 
   return (
@@ -101,10 +126,8 @@ function Word({
       className={`px-6 py-3  rounded-full text-app-contrast text-sm font-bold ${color} active:translate-y-0.5`}
       onClick={() => {
         if (checked) {
-          setChecked(false)
-          setCheckedValues(prev => prev.filter(w => w.word !== word.word))
+          setCheckedValues(prev => prev.filter(w => w.id !== word.id))
         } else {
-          setChecked(true)
           setCheckedValues(prev => [...prev, word])
         }
       }}
