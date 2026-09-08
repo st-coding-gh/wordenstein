@@ -1,7 +1,7 @@
 "use client"
 
 import { api } from "@/services/api"
-import { Button, Input, Skeleton } from "antd"
+import { Button, Input, Pagination, Skeleton } from "antd"
 import {
   CheckCircleFilled,
   CloseCircleFilled,
@@ -10,16 +10,19 @@ import React, { useEffect, useState } from "react"
 import { TGetPossiblyUnknownRes, TWord } from "@/types/api.types"
 
 export default function Unknown() {
+  const pageSize = 100
   const [loading, setLoading] = useState(true)
   const [unknown, setUnknown] = useState<TGetPossiblyUnknownRes>([])
   const [input, setInput] = useState("")
   const [checkedValues, setCheckedValues] = useState<TGetPossiblyUnknownRes>([])
   const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
   const [searchResults, setSearchResults] = useState<string[]>([])
   const [searching, setSearching] = useState(false)
+  const displayedUnknown = unknown.slice((page - 1) * pageSize, page * pageSize)
   const allDisplayedSelected =
-    unknown.length > 0 &&
-    unknown.every((word) => checkedValues.some((checked) => checked.id === word.id))
+    displayedUnknown.length > 0 &&
+    displayedUnknown.every((word) => checkedValues.some((checked) => checked.id === word.id))
 
   useEffect(() => {
     api.getUnknown().then((res) => {
@@ -124,25 +127,36 @@ export default function Unknown() {
 
         <div>
           <div className="flex items-center justify-center gap-2 py-3">
-            <p className="text-xs font-black">{unknown.length} of {total}</p>
+            <p className="text-xs font-black">{displayedUnknown.length} of {total}</p>
             <Button
               type="text"
               shape="circle"
               size="small"
               className="!h-5 !w-5 !border-0 !p-0 !text-app-primary"
-              disabled={unknown.length === 0}
+              disabled={displayedUnknown.length === 0}
               aria-label={allDisplayedSelected ? "deselect all" : "select all"}
               title={allDisplayedSelected ? "deselect all" : "select all"}
               icon={
                 allDisplayedSelected ? <CloseCircleFilled /> : <CheckCircleFilled />
               }
               onClick={() => {
-                setCheckedValues(allDisplayedSelected ? [] : unknown)
+                setCheckedValues((previous) =>
+                  allDisplayedSelected
+                    ? previous.filter(
+                        (word) => !displayedUnknown.some((displayed) => displayed.id === word.id)
+                      )
+                    : [
+                        ...previous,
+                        ...displayedUnknown.filter(
+                          (word) => !previous.some((checked) => checked.id === word.id)
+                        ),
+                      ]
+                )
               }}
             />
           </div>
           <ul className="flex flex-row gap-2 flex-wrap">
-            {unknown.map((word) => (
+            {displayedUnknown.map((word) => (
               <li key={word.id}>
                 <Word
                   word={word}
@@ -152,6 +166,17 @@ export default function Unknown() {
               </li>
             ))}
           </ul>
+          {total > pageSize && (
+            <div className="flex justify-center pt-5">
+              <Pagination
+                current={page}
+                pageSize={pageSize}
+                total={total}
+                showSizeChanger={false}
+                onChange={setPage}
+              />
+            </div>
+          )}
         </div>
       </div>
     </Skeleton>
