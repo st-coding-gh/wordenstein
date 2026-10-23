@@ -69,7 +69,7 @@ class GPT {
 
   async imageForCard(prompt: string) {
     const req = (await this.vseGpt.images.generate({
-      model: 'img-stable/stable-diffusion-xl-1024',
+      model: 'img-stable/stable-diffusion-xl-lightning',
       prompt: prompt,
       response_format: 'b64_json',
     })) as unknown as {

@@ -85,12 +85,12 @@ export type TGenerateUnknownLog = {
   id: number
   dateTime: string
   isFinished: boolean
-  isSuccess: boolean
+  isSuccess: boolean | null
   totalCards: number
-  generatedCards: number
-  totalTimeMs: number
-  estimatedEndTimeMs: number
-  errorMessage: string
+  generatedCards: number | null
+  totalTimeMs: number | null
+  estimatedEndTimeMs: number | null
+  errorMessage: string | null
 }
 
 export type TGenerateUnknownLogs = TGenerateUnknownLog[]

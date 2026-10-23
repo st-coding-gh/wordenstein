@@ -186,8 +186,12 @@ class Api {
     return await this.fetch('vocabular/delete-possibly-unknown-all')
   }
 
-  async generateAllUnknown() {
-    return await this.fetch('vocabular/generate-all-unknown')
+  async generateAllUnknown(limit?: number) {
+    return await this.fetch('vocabular/generate-all-unknown', { limit })
+  }
+
+  async generateOneUnknown(id: string) {
+    return await this.fetch('vocabular/generate-one-unknown', { id })
   }
 
   async getGenerateUnknownLogs() {

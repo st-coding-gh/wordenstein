@@ -158,6 +158,7 @@ export const MODELS = [
   'openai/dall-e-3',
   'img-dummy/image',
   'img-stable/stable-diffusion-xl-1024',
+  'img-stable/stable-diffusion-xl-lightning',
   'img-playground-v2-5-1024px',
   'img-flux/schnell',
   'img-flux/dev',

@@ -230,7 +230,7 @@ function GenerationChart({ logs }: { logs: TGenerateUnknownLogs }) {
     })
   }
 
-  const generatedCardsData = validLogs.map(log => log.generatedCards)
+  const generatedCardsData = validLogs.map(log => log.generatedCards ?? 0)
   const trendLineData = calculateTrendLine(generatedCardsData)
 
   const chartData = {

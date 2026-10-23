@@ -34,7 +34,7 @@ export default function Vocabular() {
 
       <VocabularButton
         icon={<FireOutlined />}
-        label="generate all unknown"
+        label="generate unknown"
         action={() => router.push('/vocabular/generate-all-unknown')}
       />
     </div>
